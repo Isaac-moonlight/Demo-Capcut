@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
   BellRing,
-  Flame,
   CheckCircle2,
   Clock,
   Sparkles,
   Droplets,
-  HelpCircle,
   Check,
 } from 'lucide-react';
 import { useRestaurant } from '../../context/RestaurantContext';
@@ -19,27 +18,27 @@ interface LiveOrderRadarProps {
 const STEPS: { status: OrderStatus; label: string; icon: string; desc: string }[] = [
   {
     status: 'received',
-    label: 'Reçue en brigade',
+    label: 'Reçue',
     icon: '📝',
-    desc: 'Bons imprimés et affectés aux postes',
+    desc: 'Bons imprimés',
   },
   {
     status: 'in_kitchen',
-    label: 'En cuisson & dressage',
+    label: 'Cuisson',
     icon: '🔥',
-    desc: 'Le Chef et la brigade préparent vos mets',
+    desc: 'Sur les feux',
   },
   {
     status: 'ready',
-    label: 'Prête au passe',
+    label: 'Passe',
     icon: '🛎️',
-    desc: 'Contrôle qualité & cloche de service',
+    desc: 'Cloche sonnée',
   },
   {
     status: 'served',
-    label: 'Servie à table',
+    label: 'À Table',
     icon: '🍷',
-    desc: 'Service en salle & dégustation',
+    desc: 'Servie en salle',
   },
 ];
 
@@ -54,54 +53,50 @@ export const LiveOrderRadar: React.FC<LiveOrderRadarProps> = ({ onOrderServed })
 
   const handleQuickCall = async (type: 'call_waiter' | 'water_bread', label: string) => {
     await callWaiter(type, label);
-    setCallSuccessMessage(`${label} transmise au maître d'hôtel ✓`);
-    setTimeout(() => setCallSuccessMessage(null), 4000);
+    setCallSuccessMessage(`${label} transmise ✓`);
+    setTimeout(() => setCallSuccessMessage(null), 3500);
   };
 
   return (
-    <div className="rounded-3xl p-5 sm:p-6 bg-[#0f131d] border border-amber-500/30 shadow-2xl relative overflow-hidden text-stone-100 mb-8">
-      {/* Radiant Radar Glow */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="rounded-[24px] p-3.5 sm:p-4 bg-white dark:bg-[#1c1c1e] border border-stone-200 dark:border-[#2c2c2e] shadow-md relative overflow-hidden text-black dark:text-white mb-4"
+    >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-stone-800 relative z-10">
+      <div className="flex items-center justify-between pb-2.5 border-b border-stone-100 dark:border-[#2c2c2e]">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-            <span>Radar de Cuisson en Direct</span>
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-[10px] font-extrabold uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ff9f0a] animate-ping" />
+            <span>Suivi Radar</span>
           </div>
-          <h3 className="text-xl font-bold font-serif-luxury text-stone-100 flex items-center gap-2">
-            <span>Commande #{activeTableOrder.id}</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-stone-800 text-amber-400 font-sans border border-amber-500/20">
-              Table {selectedTable}
-            </span>
+          <h3 className="text-base font-extrabold tracking-tight mt-1">
+            Commande #{activeTableOrder.id} • Table {selectedTable}
           </h3>
         </div>
 
-        {/* Real-time pulse indicator */}
-        <div className="flex items-center gap-2 bg-[#141824] px-3.5 py-2 rounded-2xl border border-stone-800">
-          <Clock className="w-4 h-4 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
-          <div className="text-right">
-            <span className="text-[11px] text-stone-400 block leading-none">Statut</span>
-            <span className="text-xs font-bold text-amber-300">
-              {STEPS[activeStepIdx]?.label}
-            </span>
-          </div>
+        <div className="flex items-center gap-1.5 bg-[#f2f2f7] dark:bg-[#2c2c2e] px-2.5 py-1 rounded-full">
+          <Clock className="w-3 h-3 text-[#ff9f0a]" />
+          <span className="text-[11px] font-bold text-[#ff9f0a]">
+            {STEPS[activeStepIdx]?.label}
+          </span>
         </div>
       </div>
 
-      {/* 4-Step Progress Radar Line */}
-      <div className="py-6 relative z-10">
-        {/* Connected Line */}
-        <div className="relative mb-6">
-          <div className="h-1.5 bg-stone-800 rounded-full w-full" />
-          <div
-            className="h-1.5 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 rounded-full absolute top-0 left-0 transition-all duration-700"
-            style={{ width: `${(activeStepIdx / (STEPS.length - 1)) * 100}%` }}
+      {/* 4-Step Progress Line */}
+      <div className="py-3">
+        <div className="relative mb-3">
+          <div className="h-1 bg-stone-200 dark:bg-stone-700 rounded-full w-full" />
+          <motion.div
+            className="h-1 bg-[#ff9f0a] rounded-full absolute top-0 left-0"
+            initial={{ width: 0 }}
+            animate={{ width: `${(activeStepIdx / (STEPS.length - 1)) * 100}%` }}
+            transition={{ duration: 0.5 }}
           />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-1.5">
           {STEPS.map((step, idx) => {
             const isCompleted = idx < activeStepIdx;
             const isCurrent = idx === activeStepIdx;
@@ -109,53 +104,42 @@ export const LiveOrderRadar: React.FC<LiveOrderRadarProps> = ({ onOrderServed })
             return (
               <div
                 key={step.status}
-                className={`p-3.5 rounded-2xl border transition-all ${
+                className={`p-2 rounded-xl border text-center transition-all ${
                   isCurrent
-                    ? 'bg-gradient-to-b from-[#1b2233] to-[#121622] border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.2)] scale-[1.02]'
+                    ? 'bg-black text-white dark:bg-white dark:text-black border-transparent shadow-sm'
                     : isCompleted
-                    ? 'bg-[#121620] border-emerald-500/30 text-stone-300'
-                    : 'bg-[#10141e] border-stone-800/80 text-stone-500 opacity-60'
+                    ? 'bg-[#f2f2f7] dark:bg-[#2c2c2e] border-emerald-500/30'
+                    : 'bg-[#f2f2f7] dark:bg-[#2c2c2e] border-transparent opacity-50'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xl">{step.icon}</span>
-                  {isCompleted ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  ) : isCurrent ? (
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-                  ) : (
-                    <span className="w-2 h-2 rounded-full bg-stone-700" />
-                  )}
-                </div>
-
-                <div className="text-xs font-bold text-stone-100">{step.label}</div>
-                <div className="text-[10px] text-stone-400 mt-0.5 leading-snug">{step.desc}</div>
+                <div className="text-sm mb-0.5">{step.icon}</div>
+                <div className="text-[10px] font-extrabold leading-tight">{step.label}</div>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* Summary of Items Ordered */}
-      <div className="bg-[#121622] rounded-2xl p-4 border border-stone-800/80 mb-5 relative z-10">
-        <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2.5 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Mets en Préparation ({activeTableOrder.items.length})</span>
+      {/* Summary of Items */}
+      <div className="bg-[#f2f2f7] dark:bg-[#2c2c2e] rounded-xl p-2.5 mb-3">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-[#ff9f0a]" />
+          <span>Menu commandé ({activeTableOrder.items.length})</span>
         </div>
 
-        <div className="divide-y divide-stone-800/60">
+        <div className="divide-y divide-stone-200 dark:divide-stone-700 max-h-28 overflow-y-auto">
           {activeTableOrder.items.map((item, idx) => (
-            <div key={idx} className="py-2 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-amber-300">{item.quantity}×</span>
-                <span className="text-stone-200">{item.name}</span>
+            <div key={idx} className="py-1 flex items-center justify-between text-[11px]">
+              <div className="truncate">
+                <span className="font-extrabold text-[#ff9f0a] mr-1">{item.quantity}×</span>
+                <span>{item.name}</span>
                 {item.cookingPreference && (
-                  <span className="text-[10px] text-stone-400 italic">
+                  <span className="text-[9px] text-stone-400 ml-1">
                     ({item.cookingPreference})
                   </span>
                 )}
               </div>
-              <span className="font-semibold text-stone-400">
+              <span className="font-bold text-stone-600 dark:text-stone-400 flex-shrink-0">
                 {item.totalPrice.toFixed(2)} €
               </span>
             </div>
@@ -163,59 +147,59 @@ export const LiveOrderRadar: React.FC<LiveOrderRadarProps> = ({ onOrderServed })
         </div>
       </div>
 
-      {/* If served, quick transition button */}
+      {/* Served alert banner */}
       {activeTableOrder.status === 'served' && (
-        <div className="mb-5 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3 animate-pulse">
-          <div className="flex items-center gap-2.5">
-            <span className="text-2xl">🍷</span>
+        <div className="mb-3 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-base">🍷</span>
             <div>
-              <p className="text-xs font-bold text-emerald-300">
-                Vos plats sont servis à votre table !
+              <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                Plats servis à votre table !
               </p>
-              <p className="text-[11px] text-stone-400">
-                Bon appétit et excellente dégustation.
+              <p className="text-[9px] text-stone-500">
+                Bonne dégustation.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onOrderServed}
-            className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold text-xs transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded-full bg-emerald-500 text-white font-extrabold text-[10px] cursor-pointer"
           >
-            Options Service
+            Options
           </button>
         </div>
       )}
 
       {/* Live Table Assistance Buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-stone-800 relative z-10">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 pt-1 border-t border-stone-100 dark:border-[#2c2c2e]">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
-            onClick={() => handleQuickCall('water_bread', "Demande d'eau & pain")}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white text-xs font-semibold transition-all cursor-pointer"
+            onClick={() => handleQuickCall('water_bread', 'Eau & Pain')}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#f2f2f7] dark:bg-[#2c2c2e] text-xs font-semibold hover:bg-stone-200 dark:hover:bg-[#3a3a3c] transition-all cursor-pointer"
           >
-            <Droplets className="w-3.5 h-3.5 text-sky-400" />
+            <Droplets className="w-3 h-3 text-sky-500" />
             <span>Eau / Pain</span>
           </button>
 
           <button
             type="button"
-            onClick={() => handleQuickCall('call_waiter', 'Appel du maître d’hôtel')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-semibold transition-all cursor-pointer"
+            onClick={() => handleQuickCall('call_waiter', 'Appel Serveur')}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-xs font-bold hover:bg-[#ff9f0a]/25 transition-all cursor-pointer"
           >
-            <BellRing className="w-3.5 h-3.5 text-amber-400" />
-            <span>Appeler le Serveur</span>
+            <BellRing className="w-3 h-3 text-[#ff9f0a]" />
+            <span>Appel Serveur</span>
           </button>
         </div>
 
         {callSuccessMessage && (
-          <div className="text-xs font-medium text-emerald-400 flex items-center gap-1 animate-in fade-in">
-            <Check className="w-3.5 h-3.5" />
+          <div className="text-[10px] font-bold text-emerald-500 flex items-center gap-1">
+            <Check className="w-3 h-3 stroke-[3]" />
             <span>{callSuccessMessage}</span>
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };

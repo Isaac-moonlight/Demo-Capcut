@@ -1,119 +1,113 @@
 import React from 'react';
-import { Sparkles, Wine, Award, Clock, ChevronDown } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Sparkles, Utensils, Star } from 'lucide-react';
 import { MENU_CATEGORIES } from '../../data/menuData';
+import { WavyText } from '../common/WavyText';
 
 interface HeroHeaderProps {
   onCategoryClick: (categoryId: string) => void;
   activeCategory: string;
+  onPlateClick?: (e: React.MouseEvent) => void;
 }
 
-export const HeroHeader: React.FC<HeroHeaderProps> = ({ onCategoryClick, activeCategory }) => {
+export const HeroHeader: React.FC<HeroHeaderProps> = ({
+  onCategoryClick,
+  activeCategory,
+  onPlateClick,
+}) => {
   return (
-    <div className="relative overflow-hidden pt-8 pb-12 px-4 sm:px-6 lg:px-8 border-b border-amber-500/10">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[350px] bg-gradient-to-b from-amber-500/15 via-amber-600/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden pt-2 pb-4 px-3 sm:px-4">
+      <div className="flex flex-col items-center text-center relative z-10">
+        {/* iOS-styled Minimalist Pill Badge */}
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', damping: 16, stiffness: 350 }}
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] dark:text-[#ffd60a] text-[11px] font-bold tracking-tight mb-2 border border-[#ff9f0a]/30"
+        >
+          <Sparkles className="w-3 h-3 text-[#ff9f0a]" />
+          <span>Menu • DineFlow Pro</span>
+        </motion.div>
 
-      {/* Floating Golden Particles (SVG decor) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-8 left-12 w-2 h-2 rounded-full bg-amber-400/60 blur-[1px] animate-pulse" />
-        <div className="absolute top-24 right-16 w-3 h-3 rounded-full bg-yellow-300/50 blur-[1px] animate-pulse delay-700" />
-        <div className="absolute bottom-16 left-1/4 w-2.5 h-2.5 rounded-full bg-amber-500/40 blur-[1px] animate-pulse delay-1000" />
-        <div className="absolute top-16 right-1/3 w-1.5 h-1.5 rounded-full bg-amber-200/70 blur-[1px] animate-pulse delay-500" />
-      </div>
+        {/* TITLE: JUST "Menu" WITH WAVY UNDULATION KEYFRAME */}
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-black dark:text-white">
+          <WavyText text="Menu" delayOffset={0} />
+        </h1>
 
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-        {/* Left side: Editorial text & Haute Gastronomie Presentation */}
-        <div className="flex-1 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm backdrop-blur-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Table Étoilée & Produits d’Exception</span>
-          </div>
+        {/* Circular Plate with impact zoom keyframes */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{
+            scale: [1, 1.06, 0.98, 1.05, 1],
+            rotate: [0, 1.5, -1.5, 0.5, 0],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            repeatType: 'loop',
+            ease: 'easeInOut',
+          }}
+          whileTap={{ scale: 1.15 }}
+          onClick={(e) => onPlateClick && onPlateClick(e)}
+          className="relative flex items-center justify-center my-3 cursor-pointer"
+        >
+          {/* Concentric halo */}
+          <div className="absolute w-36 h-36 rounded-full border border-[#ff9f0a]/30 animate-pulse-gold pointer-events-none" />
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-serif-luxury tracking-tight leading-tight text-stone-900 dark:text-stone-100">
-            L’Émotion Pure du Terroir & du Geste Culinaire
-          </h1>
-
-          <p className="mt-4 text-stone-600 dark:text-stone-300 text-sm sm:text-base max-w-xl leading-relaxed font-sans-clean">
-            Découvrez une symphonie de saveurs orchestrée par notre brigade. Des criées bretonnes aux élevages d’alpage, chaque assiette célèbre la tradition sublimée par l’audace contemporaine.
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-5 text-xs text-stone-500 dark:text-stone-400">
-            <div className="flex items-center gap-1.5">
-              <Award className="w-4 h-4 text-amber-500" />
-              <span>3 Étoiles Michelin</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-amber-500" />
-              <span>Dressage Minute & Précision</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Wine className="w-4 h-4 text-amber-500" />
-              <span>Accords Mets & Vins Rares</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right side: Grand Levitation Plate with aromatic leaves */}
-        <div className="relative flex-shrink-0 flex items-center justify-center">
-          {/* Subtle concentric plate halo */}
-          <div className="absolute w-72 h-72 sm:w-84 sm:h-84 rounded-full border border-amber-500/20 animate-pulse-gold pointer-events-none" />
-          <div className="absolute w-64 h-64 sm:w-76 sm:h-76 rounded-full border border-amber-500/10 pointer-events-none" />
-
-          {/* Floating Aromatic Leaves (decor) */}
-          <div className="absolute -top-3 -left-4 text-xl select-none animate-bounce duration-1000 pointer-events-none">
+          {/* Floating elements */}
+          <motion.div
+            animate={{ y: [-5, 5, -5], rotate: [-8, 8, -8] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute -top-2 -left-2 text-lg pointer-events-none"
+          >
             🌿
-          </div>
-          <div className="absolute top-2 -right-5 text-lg select-none pointer-events-none rotate-45">
+          </motion.div>
+          <motion.div
+            animate={{ y: [5, -5, 5], rotate: [8, -8, 8] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+            className="absolute -bottom-2 -right-2 text-base pointer-events-none"
+          >
             🍃
-          </div>
-          <div className="absolute -bottom-2 right-4 text-base select-none pointer-events-none -rotate-12">
-            🌱
-          </div>
+          </motion.div>
 
-          {/* Center Levitation Circular Plate */}
-          <div className="relative w-56 h-56 sm:w-68 sm:h-68 rounded-full p-2 bg-gradient-to-tr from-amber-500/30 via-yellow-200/20 to-amber-600/30 shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-float-plate overflow-hidden">
-            <div className="w-full h-full rounded-full overflow-hidden border-4 border-stone-800/80 shadow-inner relative group">
+          {/* Center Plate */}
+          <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1 bg-gradient-to-tr from-[#ff9f0a]/40 to-[#ffd60a]/40 shadow-xl overflow-hidden">
+            <div className="w-full h-full rounded-full overflow-hidden border border-black dark:border-white/20 relative group">
               <img
-                src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1000&auto=format&fit=crop"
-                alt="Assiette Gastronomique Signature"
-                className="w-full h-full object-cover object-center transform scale-105 group-hover:scale-110 transition-transform duration-700"
+                src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=600&auto=format&fit=crop"
+                alt="Menu"
+                className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-300"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-4">
-                <span className="text-[11px] font-semibold text-amber-200 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/30">
-                  Signature Wagyu & Morilles
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-1">
+                <span className="text-[9px] font-black uppercase text-white bg-black/70 px-2 py-0.5 rounded-full">
+                  Menu
                 </span>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Raccourcis de Catégories sous forme de badges pour scroller instantanément */}
-      <div className="max-w-6xl mx-auto mt-10">
-        <div className="flex items-center justify-between mb-3 px-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-500/90 flex items-center gap-1.5">
-            <ChevronDown className="w-3.5 h-3.5" /> Navigation Rapide par Services
-          </span>
-          <span className="text-[11px] text-stone-500">6 univers culinaires</span>
-        </div>
-
-        <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none snap-x">
+      {/* iOS Segmented Category Controls (iPhone-styled horizontal sliding tabs) */}
+      <div className="mt-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none snap-x px-1">
           {MENU_CATEGORIES.map((cat) => {
             const isCurrent = activeCategory === cat.id;
             return (
-              <button
+              <motion.button
                 key={cat.id}
                 type="button"
+                whileTap={{ scale: 0.92 }}
                 onClick={() => onCategoryClick(cat.id)}
-                className={`snap-start flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                className={`snap-start flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   isCurrent
-                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-[0_4px_15px_rgba(245,158,11,0.4)] scale-105 ring-1 ring-amber-300'
-                    : 'bg-stone-100 dark:bg-[#141824] hover:bg-stone-200 dark:hover:bg-[#1c2233] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:border-amber-500/40'
+                    ? 'bg-black text-white dark:bg-white dark:text-black shadow-md scale-105'
+                    : 'bg-[#e5e5ea] text-[#3a3a3c] dark:bg-[#1c1c1e] dark:text-[#98989d] hover:bg-[#d1d1d6] dark:hover:bg-[#2c2c2e]'
                 }`}
               >
-                <span className="text-base">{cat.icon}</span>
-                <span>{cat.name}</span>
-              </button>
+                <span className="text-xs">{cat.icon}</span>
+                <span className="whitespace-nowrap font-semibold">{cat.name}</span>
+              </motion.button>
             );
           })}
         </div>

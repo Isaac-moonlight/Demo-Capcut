@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { Utensils, CheckCircle2, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Utensils, CheckCircle2 } from 'lucide-react';
 import { useRestaurant } from '../../context/RestaurantContext';
 import { GastronomyLogo } from '../common/GastronomyLogo';
 
 interface TableSelectModalProps {
   isOpen: boolean;
   onClose?: () => void;
+  onTableSelected?: (table: string) => void;
 }
 
-export const TableSelectModal: React.FC<TableSelectModalProps> = ({ isOpen, onClose }) => {
+export const TableSelectModal: React.FC<TableSelectModalProps> = ({
+  isOpen,
+  onClose,
+  onTableSelected,
+}) => {
   const { selectedTable, setSelectedTable, orders } = useRestaurant();
   const [tempTable, setTempTable] = useState<string>(selectedTable || 'T1');
 
@@ -18,92 +24,95 @@ export const TableSelectModal: React.FC<TableSelectModalProps> = ({ isOpen, onCl
 
   const handleConfirm = () => {
     setSelectedTable(tempTable);
+    if (onTableSelected) onTableSelected(tempTable);
     if (onClose) onClose();
   };
 
-  // Check if table is occupied
   const isTableOccupied = (t: string) => {
-    return orders.some((o) => o.tableNumber === t && ['received', 'in_kitchen', 'ready', 'served'].includes(o.status));
+    return orders.some(
+      (o) =>
+        o.tableNumber === t &&
+        ['received', 'in_kitchen', 'ready', 'served'].includes(o.status)
+    );
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="relative w-full max-w-md rounded-3xl bg-[#0f131d] border border-amber-500/30 p-6 md:p-8 text-stone-100 shadow-2xl overflow-hidden">
-        {/* Decorative background glow */}
-        <div className="absolute -top-16 -right-16 w-44 h-44 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-44 h-44 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Center Logo */}
-        <div className="flex flex-col items-center text-center mb-6">
-          <GastronomyLogo size="lg" showText={false} />
-          <h1 className="mt-4 text-2xl font-bold font-serif-luxury tracking-wide text-amber-200">
-            Bienvenue à l’Ambroisie
-          </h1>
-          <p className="text-xs text-stone-400 mt-1 max-w-[280px]">
-            Veuillez sélectionner le numéro de votre table pour commander en toute fluidité depuis votre smartphone.
-          </p>
-        </div>
-
-        {/* Table Grid (T1 to T12) */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-amber-400/80 mb-3 px-1">
-            <span>Tables du Restaurant</span>
-            <span className="text-[11px] text-stone-400 lowercase font-normal flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-400" /> Salle Principale & Salons
-            </span>
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 30 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 30 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 300 }}
+          className="relative w-full max-w-sm rounded-[28px] bg-white dark:bg-[#1c1c1e] text-black dark:text-white p-5 shadow-2xl border border-stone-200 dark:border-[#2c2c2e] overflow-hidden"
+        >
+          {/* Center Logo */}
+          <div className="flex flex-col items-center text-center mb-4">
+            <GastronomyLogo size="sm" showText={false} />
+            <h2 className="mt-2 text-xl font-extrabold tracking-tight">
+              Menu • Table
+            </h2>
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 font-bold uppercase tracking-wider">
+              Menu
+            </p>
           </div>
 
-          <div className="grid grid-cols-4 gap-2.5">
-            {tableList.map((tbl) => {
-              const isSelected = tempTable === tbl;
-              const occupied = isTableOccupied(tbl);
+          {/* Table Grid (T1 to T12) */}
+          <div className="mb-4">
+            <div className="grid grid-cols-4 gap-2">
+              {tableList.map((tbl) => {
+                const isSelected = tempTable === tbl;
+                const occupied = isTableOccupied(tbl);
 
-              return (
-                <button
-                  key={tbl}
-                  type="button"
-                  onClick={() => setTempTable(tbl)}
-                  className={`relative h-16 rounded-2xl flex flex-col items-center justify-center transition-all duration-200 cursor-pointer ${
-                    isSelected
-                      ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-stone-950 font-extrabold shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-105 ring-2 ring-amber-300'
-                      : occupied
-                      ? 'bg-[#181d2a] border border-amber-500/20 text-stone-300 hover:border-amber-500/40'
-                      : 'bg-[#141824] border border-stone-800 text-stone-300 hover:border-amber-500/40 hover:bg-[#1a2030]'
-                  }`}
-                >
-                  <span className="text-sm font-bold tracking-tight">{tbl}</span>
-                  <span
-                    className={`text-[9px] uppercase tracking-wider ${
-                      isSelected ? 'text-stone-900 font-semibold' : occupied ? 'text-amber-400/90' : 'text-emerald-400/90'
+                return (
+                  <motion.button
+                    key={tbl}
+                    type="button"
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setTempTable(tbl)}
+                    className={`relative h-14 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-black text-white dark:bg-white dark:text-black font-black shadow-md'
+                        : occupied
+                        ? 'bg-[#f2f2f7] dark:bg-[#2c2c2e] text-stone-400 border border-transparent'
+                        : 'bg-[#f2f2f7] dark:bg-[#2c2c2e] text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-[#3a3a3c]'
                     }`}
                   >
-                    {occupied ? 'Occupée' : 'Disponible'}
-                  </span>
-                  {isSelected && (
-                    <div className="absolute top-1 right-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-stone-950" />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
+                    <span className="text-sm font-bold tracking-tight">{tbl}</span>
+                    <span
+                      className={`text-[8px] uppercase tracking-wider font-bold ${
+                        isSelected
+                          ? 'opacity-80'
+                          : occupied
+                          ? 'text-[#ff9f0a]'
+                          : 'text-[#30d158]'
+                      }`}
+                    >
+                      {occupied ? 'Occupée' : 'Libre'}
+                    </span>
+                    {isSelected && (
+                      <div className="absolute top-1 right-1">
+                        <CheckCircle2 className="w-3 h-3 text-current" />
+                      </div>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Confirm Button */}
-        <button
-          type="button"
-          onClick={handleConfirm}
-          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-base shadow-[0_4px_25px_rgba(245,158,11,0.4)] hover:shadow-[0_4px_30px_rgba(245,158,11,0.6)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <Utensils className="w-5 h-5 text-stone-950" />
-          <span>Accéder à la Carte ({tempTable})</span>
-        </button>
-
-        <p className="text-[11px] text-stone-500 text-center mt-4">
-          Vous pourrez modifier votre table à tout moment depuis la barre supérieure.
-        </p>
+          {/* Confirm Button */}
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.94 }}
+            onClick={handleConfirm}
+            className="w-full py-3.5 px-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-extrabold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Utensils className="w-4 h-4" />
+            <span>Valider Table {tempTable}</span>
+          </motion.button>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   );
 };

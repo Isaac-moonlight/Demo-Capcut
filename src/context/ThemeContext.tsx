@@ -21,13 +21,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
-      document.body.style.backgroundColor = '#0b0e14';
-      document.body.style.color = '#f8fafc';
+      document.body.style.backgroundColor = '#000000';
+      document.body.style.color = '#ffffff';
     } else {
       root.classList.remove('dark');
       root.classList.add('light');
-      document.body.style.backgroundColor = '#faf6f0';
-      document.body.style.color = '#1c1917';
+      document.body.style.backgroundColor = '#f2f2f7';
+      document.body.style.color = '#000000';
     }
     localStorage.setItem('dineflow_theme', theme);
   }, [theme]);

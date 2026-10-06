@@ -1,14 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Utensils,
   ShoppingBag,
-  BellRing,
   Sparkles,
-  ChevronUp,
-  Receipt,
-  Heart,
-  HelpCircle,
-  Wine,
 } from 'lucide-react';
 import { useRestaurant } from './context/RestaurantContext';
 import { useTheme } from './context/ThemeContext';
@@ -19,6 +14,7 @@ import { Dish } from './types';
 import { GastronomyLogo } from './components/common/GastronomyLogo';
 import { ThemeToggle } from './components/common/ThemeToggle';
 import { PinModal } from './components/common/PinModal';
+import { FlyingItemToCart, FlyingItem } from './components/common/FlyingItemToCart';
 
 // Client Components
 import { TableSelectModal } from './components/client/TableSelectModal';
@@ -32,8 +28,42 @@ import { PostServiceModal } from './components/client/PostServiceModal';
 import { BillPaymentModal } from './components/client/BillPaymentModal';
 import { SatisfactionFeedbackModal } from './components/client/SatisfactionFeedbackModal';
 
-// Staff Layout
+// Staff Layout (PC Wide Mode)
 import { StaffLayout } from './components/staff/StaffLayout';
+
+// Category color aura map for dynamic morphing background
+const CATEGORY_BACKGROUND_AURAS: Record<string, { bg: string; glow: string; name: string }> = {
+  starters: {
+    bg: 'from-[#d4af37]/20 via-[#f8f4ee]/10 to-transparent',
+    glow: 'rgba(212, 175, 55, 0.25)',
+    name: 'Champagne & Or Impérial',
+  },
+  meats: {
+    bg: 'from-[#c2410c]/25 via-[#7c2d12]/15 to-transparent',
+    glow: 'rgba(194, 65, 12, 0.3)',
+    name: 'Braises & Maturation',
+  },
+  seafood: {
+    bg: 'from-[#0284c7]/25 via-[#0369a1]/15 to-transparent',
+    glow: 'rgba(2, 132, 199, 0.3)',
+    name: 'Iode & Côtes Océanes',
+  },
+  desserts: {
+    bg: 'from-[#eab308]/25 via-[#fef08a]/15 to-transparent',
+    glow: 'rgba(234, 179, 8, 0.25)',
+    name: 'Vanille & Praliné',
+  },
+  wines: {
+    bg: 'from-[#991b1b]/30 via-[#7f1d1d]/15 to-transparent',
+    glow: 'rgba(153, 27, 27, 0.35)',
+    name: 'Grands Crus & Rubis',
+  },
+  cocktails: {
+    bg: 'from-[#f59e0b]/25 via-[#b45309]/15 to-transparent',
+    glow: 'rgba(245, 158, 11, 0.3)',
+    name: 'Mixologie & Infusions',
+  },
+};
 
 export default function App() {
   const {
@@ -44,6 +74,7 @@ export default function App() {
     activeTableOrder,
     isStaffAuthenticated,
     dishes,
+    addToCart,
     finishClientService,
   } = useRestaurant();
 
@@ -59,7 +90,12 @@ export default function App() {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [activeCategoryTab, setActiveCategoryTab] = useState<string>('starters');
 
-  // View state: 'client' | 'staff'
+  // Flying items to cart state (Éléments qui se déplacent d'un point à un autre)
+  const [flyingItems, setFlyingItems] = useState<FlyingItem[]>([]);
+  const cartButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [cartBounce, setCartBounce] = useState(false);
+
+  // View state: 'client' (téléphone-tablette) | 'staff' (PC mode)
   const [currentView, setCurrentView] = useState<'client' | 'staff'>('client');
 
   // Category refs for smooth scrolling
@@ -79,14 +115,50 @@ export default function App() {
     }
   }, [activeTableOrder?.status]);
 
-  // Scroll smoothly to a menu section
+  // Scroll smoothly to a menu section and trigger morphing background aura
   const scrollToCategory = (catId: string) => {
     setActiveCategoryTab(catId);
     const elem = categoryRefs.current[catId];
     if (elem) {
-      const topOffset = elem.getBoundingClientRect().top + window.scrollY - 90;
+      const topOffset = elem.getBoundingClientRect().top + window.scrollY - 75;
       window.scrollTo({ top: topOffset, behavior: 'smooth' });
     }
+  };
+
+  // Flying Item Handler (déplacement fluide vers le panier)
+  const handleQuickAddWithFly = (e: React.MouseEvent, dish: Dish) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const cartRect = cartButtonRef.current?.getBoundingClientRect() || {
+      left: window.innerWidth - 60,
+      top: 30,
+    };
+
+    const newFlyingItem: FlyingItem = {
+      id: `fly-${Date.now()}-${Math.random()}`,
+      startX: rect.left + rect.width / 2,
+      startY: rect.top + rect.height / 2,
+      targetX: cartRect.left + 20,
+      targetY: cartRect.top + 20,
+      image: dish.image,
+    };
+
+    setFlyingItems((prev) => [...prev, newFlyingItem]);
+
+    // Add to cart in context
+    addToCart({
+      dishId: dish.id,
+      name: dish.name,
+      price: dish.price,
+      quantity: 1,
+      selectedAddons: [],
+      image: dish.image,
+    });
+  };
+
+  const handleFlyingComplete = (id: string) => {
+    setFlyingItems((prev) => prev.filter((i) => i.id !== id));
+    setCartBounce(true);
+    setTimeout(() => setCartBounce(false), 400);
   };
 
   // Staff entrance handlers (Triple click or discreet dot)
@@ -103,239 +175,250 @@ export default function App() {
     setCurrentView('staff');
   };
 
-  // If in staff view and staff is authenticated, show the complete Staff Brigade ERP
+  // 1. SECTION BRIGADE / STAFF : RESTE EN MODE PC (Large Desktop Dashboard 100%)
   if (currentView === 'staff' && isStaffAuthenticated) {
     return <StaffLayout onBackToClient={() => setCurrentView('client')} />;
   }
 
+  // Active category aura
+  const activeAura = CATEGORY_BACKGROUND_AURAS[activeCategoryTab] || CATEGORY_BACKGROUND_AURAS.starters;
+
+  // 2. SECTION CLIENT : ADAPTÉE EN MODE TÉLÉPHONE-TABLETTE (max-w-md sm:max-w-xl centré)
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0b0e14] text-stone-100' : 'bg-[#faf6f0] text-stone-900'} transition-colors duration-200 selection:bg-amber-500/30 selection:text-amber-200`}>
-      {/* 1. TOP CLIENT HEADER */}
-      <header className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors ${
-        theme === 'dark' ? 'bg-[#0d1017]/95 border-amber-500/15' : 'bg-[#faf6f0]/95 border-stone-200'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          {/* Logo with TRIPLE-CLICK secret staff trigger */}
-          <div className="flex items-center">
-            <GastronomyLogo
-              size="md"
-              onTripleClick={handleOpenStaffAuth}
-              className="cursor-pointer"
-            />
-          </div>
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#06070a]' : 'bg-[#efebe4]'} transition-colors duration-500 flex justify-center selection:bg-[#d4af37]/30 selection:text-[#d4af37]`}>
+      {/* Flying items layer */}
+      <FlyingItemToCart items={flyingItems} onComplete={handleFlyingComplete} />
 
-          {/* Right Header Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Table Badge Selector */}
-            <button
-              type="button"
-              onClick={() => setIsTableModalOpen(true)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
-                selectedTable
-                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
-                  : 'bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-300 dark:border-stone-700'
-              }`}
-              title="Modifier le numéro de table"
-            >
-              <Utensils className="w-3.5 h-3.5 text-amber-500" />
-              <span>{selectedTable ? `Table ${selectedTable}` : 'Choisir Table'}</span>
-            </button>
+      {/* Centered Phone-Tablet Container (Format Mobile-Tablette Propre) */}
+      <div className={`w-full max-w-md sm:max-w-xl min-h-screen ${theme === 'dark' ? 'bg-[#090a0f] text-stone-100' : 'bg-[#f8f4ee] text-stone-900'} shadow-[0_0_50px_rgba(0,0,0,0.4)] border-x border-[#e8dfd5] dark:border-[#1a1d29] relative flex flex-col justify-between overflow-x-hidden transition-colors duration-300`}>
+        
+        {/* DYNAMIC MORPHING BACKGROUND (Change de couleur selon le bouton cliqué) */}
+        <motion.div
+          key={activeCategoryTab}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
+          className={`absolute top-0 left-0 right-0 h-96 bg-gradient-to-b ${activeAura.bg} pointer-events-none blur-3xl z-0`}
+        />
 
-            {/* Active order quick view button */}
+        {/* Inner Content Wrapper */}
+        <div className="relative z-10 flex flex-col flex-1">
+          {/* TOP CLIENT HEADER (Compact Mobile-Tablet Bar) */}
+          <header className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors ${
+            theme === 'dark' ? 'bg-[#090a0f]/95 border-[#1c1f2e]' : 'bg-[#f8f4ee]/95 border-[#e8dfd5]'
+          }`}>
+            <div className="px-3 sm:px-5 h-16 flex items-center justify-between gap-2">
+              {/* Logo with TRIPLE-CLICK secret staff trigger */}
+              <div className="flex items-center">
+                <GastronomyLogo
+                  size="sm"
+                  onTripleClick={handleOpenStaffAuth}
+                  className="cursor-pointer"
+                />
+              </div>
+
+              {/* Right Header Controls */}
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* Table Badge Selector */}
+                <button
+                  type="button"
+                  onClick={() => setIsTableModalOpen(true)}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                    selectedTable
+                      ? 'bg-[#d4af37]/15 text-[#b88e55] dark:text-[#e5c158] border-[#d4af37]/40 hover:bg-[#d4af37]/25'
+                      : 'bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-300 dark:border-stone-700'
+                  }`}
+                  title="Modifier le numéro de table"
+                >
+                  <Utensils className="w-3 h-3 text-[#d4af37]" />
+                  <span>{selectedTable ? `Table ${selectedTable}` : 'Table'}</span>
+                </button>
+
+                {/* Dark/Light Theme Toggle */}
+                <ThemeToggle />
+
+                {/* Cart Button with Punchy Bounce on Item Arrival */}
+                <motion.button
+                  ref={cartButtonRef}
+                  type="button"
+                  animate={cartBounce ? { scale: [1, 1.35, 0.9, 1.15, 1], rotate: [0, -10, 10, -5, 0] } : { scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  onClick={() => setIsCartOpen(true)}
+                  aria-label="Ouvrir le panier"
+                  className="relative p-2 sm:p-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#e5c158] to-[#b88e55] hover:from-[#e5c158] hover:to-[#d4af37] active:scale-90 text-stone-950 font-black transition-all shadow-md cursor-pointer"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-stone-950 text-[#e5c158] text-[9px] font-black flex items-center justify-center border border-[#d4af37] shadow-sm">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </motion.button>
+              </div>
+            </div>
+          </header>
+
+          {/* HERO HEADER (Texte qui ondule, zoom percutant, et badges) */}
+          <HeroHeader
+            onCategoryClick={scrollToCategory}
+            activeCategory={activeCategoryTab}
+          />
+
+          {/* MAIN CONTENT (Strictement 2 plats par ligne sur téléphone-tablette) */}
+          <main className="px-3 sm:px-4 py-4 space-y-6 flex-1">
+            {/* Real-time Live Order Radar if active order exists for this table */}
             {activeTableOrder && (
-              <button
-                type="button"
-                onClick={() => {
-                  window.scrollTo({ top: 300, behavior: 'smooth' });
-                }}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/40 text-amber-400 text-xs font-bold hover:scale-105 transition-all cursor-pointer"
-              >
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                <span>Suivi Commande</span>
-              </button>
+              <LiveOrderRadar
+                onOrderServed={() => setIsPostServiceModalOpen(true)}
+              />
             )}
 
-            {/* Dark/Light Theme Toggle */}
-            <ThemeToggle />
+            {/* CATALOGUE PAR CATÉGORIES (STRICTEMENT 2 PLATS PAR LIGNE) */}
+            {MENU_CATEGORIES.map((category) => {
+              const categoryDishes = dishes.filter((d) => d.category === category.id);
 
-            {/* Cart Button */}
-            <button
-              type="button"
-              onClick={() => setIsCartOpen(true)}
-              aria-label="Ouvrir le panier"
-              className="relative p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-stone-950 font-bold transition-all shadow-md cursor-pointer"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {cartItemsCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-stone-950 text-amber-300 text-[10px] font-black flex items-center justify-center border border-amber-400 shadow-sm">
-                  {cartItemsCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-      </header>
+              return (
+                <section
+                  key={category.id}
+                  ref={(el) => {
+                    categoryRefs.current[category.id] = el;
+                  }}
+                  className="pt-2 scroll-mt-20"
+                >
+                  {/* Category Header */}
+                  <div className="flex items-center justify-between gap-1 pb-2 mb-3 border-b border-[#e8dfd5] dark:border-[#1f2334]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg p-1 rounded-lg bg-[#d4af37]/15 border border-[#d4af37]/25">
+                        {category.icon}
+                      </span>
+                      <div>
+                        <h2 className="text-sm sm:text-base font-bold font-serif-luxury tracking-tight text-stone-900 dark:text-stone-100">
+                          {category.name}
+                        </h2>
+                      </div>
+                    </div>
 
-      {/* 2. HERO HEADER (Levitation Plate & Category Badges) */}
-      <HeroHeader
-        onCategoryClick={scrollToCategory}
-        activeCategory={activeCategoryTab}
-      />
-
-      {/* 3. MAIN CONTENT CONTAINER */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Real-time Live Order Radar if active order exists for this table */}
-        {activeTableOrder && (
-          <LiveOrderRadar
-            onOrderServed={() => setIsPostServiceModalOpen(true)}
-          />
-        )}
-
-        {/* 4. DISH CATALOG BY CATEGORIES (AIRY CARDS & DELIBERATE SPACING) */}
-        {MENU_CATEGORIES.map((category) => {
-          const categoryDishes = dishes.filter((d) => d.category === category.id);
-
-          return (
-            <section
-              key={category.id}
-              ref={(el) => {
-                categoryRefs.current[category.id] = el;
-              }}
-              className="pt-4 scroll-mt-24"
-            >
-              {/* Category Header */}
-              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 pb-4 mb-6 border-b border-amber-500/20">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                    {category.icon}
-                  </span>
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold font-serif-luxury tracking-tight text-stone-900 dark:text-stone-100">
-                      {category.name}
-                    </h2>
-                    <p className="text-xs text-stone-500 dark:text-stone-400 font-serif-luxury italic">
-                      {category.description}
-                    </p>
+                    <span className="text-[10px] text-[#b88e55] dark:text-[#e5c158] font-bold">
+                      {categoryDishes.length} mets
+                    </span>
                   </div>
-                </div>
 
-                <span className="text-xs text-amber-600 dark:text-amber-400/80 font-semibold self-end sm:self-auto">
-                  {categoryDishes.length} créations du Chef
-                </span>
-              </div>
-
-              {/* Airy Cards Grid (Generous spacing to avoid crowded clutter) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                {categoryDishes.map((dish) => (
-                  <DishCard
-                    key={dish.id}
-                    dish={dish}
-                    onSelect={(d) => setSelectedDishForDetail(d)}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </main>
-
-      {/* 5. FLOATING PERSISTENT CART BAR */}
-      <CartFloatingBar onOpenCart={() => setIsCartOpen(true)} />
-
-      {/* 6. MODALS & DRAWERS */}
-      {/* A. Mandatory Table Selection Modal */}
-      <TableSelectModal
-        isOpen={isTableModalOpen}
-        onClose={() => setIsTableModalOpen(false)}
-      />
-
-      {/* B. Dish Fine Customization Modal */}
-      <DishDetailModal
-        dish={selectedDishForDetail}
-        onClose={() => setSelectedDishForDetail(null)}
-      />
-
-      {/* C. Cart Drawer with Incentive Chef Gauge */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        onOrderSuccess={(orderId) => {
-          // scroll to radar
-          window.scrollTo({ top: 300, behavior: 'smooth' });
-        }}
-      />
-
-      {/* D. Post-Service Modal (Plats servis ! Desserts ou Addition) */}
-      <PostServiceModal
-        isOpen={isPostServiceModalOpen}
-        onClose={() => setIsPostServiceModalOpen(false)}
-        onChooseDesserts={() => {
-          setIsPostServiceModalOpen(false);
-          scrollToCategory('desserts');
-        }}
-        onChooseBill={() => {
-          setIsPostServiceModalOpen(false);
-          setIsBillModalOpen(true);
-        }}
-      />
-
-      {/* E. Bill Settlement Modal (Tip, Split the bill, Apple Pay / TPE) */}
-      <BillPaymentModal
-        isOpen={isBillModalOpen}
-        onClose={() => setIsBillModalOpen(false)}
-        onPaymentSuccess={() => {
-          setIsBillModalOpen(false);
-          setIsFeedbackModalOpen(true);
-        }}
-      />
-
-      {/* F. Satisfaction Feedback & Invoice Modal */}
-      <SatisfactionFeedbackModal
-        isOpen={isFeedbackModalOpen}
-        onClose={() => setIsFeedbackModalOpen(false)}
-        onFinishService={() => {
-          setIsFeedbackModalOpen(false);
-          finishClientService();
-          setIsTableModalOpen(true);
-        }}
-      />
-
-      {/* G. PIN Modal for Discreet Staff Access */}
-      <PinModal
-        isOpen={isPinModalOpen}
-        onClose={() => setIsPinModalOpen(false)}
-        onSuccess={handleStaffSuccess}
-      />
-
-      {/* 7. LUXURY FOOTER WITH DISCREET TRIGGER 2 (TINY BULLET DOT `·`) */}
-      <footer className="mt-20 border-t border-amber-500/10 py-12 px-4 sm:px-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-black/20">
-        <div className="max-w-4xl mx-auto flex flex-col items-center gap-4">
-          <GastronomyLogo size="sm" showText={false} />
-
-          <p className="font-serif-luxury text-sm text-stone-600 dark:text-stone-400 italic">
-            « La gastronomie est l’art d’utiliser la nourriture pour créer le bonheur. »
-          </p>
-
-          <p className="text-[11px] text-stone-500">
-            DineFlow Pro © {new Date().getFullYear()} — L’Ambroisie Royale • 14 Place Vendôme, 75001 Paris
-          </p>
-
-          <div className="text-[10px] text-stone-600 dark:text-stone-400 flex items-center justify-center gap-1.5 select-none">
-            <span>Tous droits réservés</span>
-            {/* Déclencheur secret 2 : Clic sur une minuscule puce (`·`) */}
-            <button
-              type="button"
-              onClick={handleOpenStaffAuth}
-              className="text-stone-600 dark:text-stone-400 hover:text-amber-500 text-xs px-1 py-0.5 cursor-pointer transition-colors"
-              title="·"
-              aria-label="Accès confidentiel"
-            >
-              ·
-            </button>
-            <span>Service en salle & brigade d’exception</span>
-          </div>
+                  {/* 2 PLATS PAR LIGNE SUR TÉLÉPHONE & TABLETTE (grid-cols-2) */}
+                  <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5">
+                    {categoryDishes.map((dish, idx) => (
+                      <DishCard
+                        key={dish.id}
+                        dish={dish}
+                        index={idx}
+                        onSelect={(d) => setSelectedDishForDetail(d)}
+                        onQuickAdd={handleQuickAddWithFly}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </main>
         </div>
-      </footer>
+
+        {/* FLOATING PERSISTENT CART BAR */}
+        <CartFloatingBar onOpenCart={() => setIsCartOpen(true)} />
+
+        {/* MODALS & DRAWERS */}
+        {/* A. Mandatory Table Selection Modal */}
+        <TableSelectModal
+          isOpen={isTableModalOpen}
+          onClose={() => setIsTableModalOpen(false)}
+        />
+
+        {/* B. Dish Fine Customization Modal */}
+        <DishDetailModal
+          dish={selectedDishForDetail}
+          onClose={() => setSelectedDishForDetail(null)}
+        />
+
+        {/* C. Cart Drawer with Incentive Chef Gauge */}
+        <CartDrawer
+          isOpen={isCartOpen}
+          onClose={() => setIsCartOpen(false)}
+          onOrderSuccess={(orderId) => {
+            window.scrollTo({ top: 150, behavior: 'smooth' });
+          }}
+        />
+
+        {/* D. Post-Service Modal (Plats servis ! Desserts ou Addition) */}
+        <PostServiceModal
+          isOpen={isPostServiceModalOpen}
+          onClose={() => setIsPostServiceModalOpen(false)}
+          onChooseDesserts={() => {
+            setIsPostServiceModalOpen(false);
+            scrollToCategory('desserts');
+          }}
+          onChooseBill={() => {
+            setIsPostServiceModalOpen(false);
+            setIsBillModalOpen(true);
+          }}
+        />
+
+        {/* E. Bill Settlement Modal (Tip, Split the bill, Apple Pay / TPE) */}
+        <BillPaymentModal
+          isOpen={isBillModalOpen}
+          onClose={() => setIsBillModalOpen(false)}
+          onPaymentSuccess={() => {
+            setIsBillModalOpen(false);
+            setIsFeedbackModalOpen(true);
+          }}
+        />
+
+        {/* F. Satisfaction Feedback & Realistic Black & White Receipt Modal */}
+        <SatisfactionFeedbackModal
+          isOpen={isFeedbackModalOpen}
+          onClose={() => setIsFeedbackModalOpen(false)}
+          onFinishService={() => {
+            setIsFeedbackModalOpen(false);
+            finishClientService();
+            setIsTableModalOpen(true);
+          }}
+        />
+
+        {/* G. PIN Modal for Discreet Staff Access */}
+        <PinModal
+          isOpen={isPinModalOpen}
+          onClose={() => setIsPinModalOpen(false)}
+          onSuccess={handleStaffSuccess}
+        />
+
+        {/* COMPACT FOOTER WITH DISCREET TRIGGER 2 (TINY BULLET DOT `·`) */}
+        <footer className="mt-8 border-t border-[#e8dfd5] dark:border-[#1c1f2e] py-6 px-3 text-center text-xs text-stone-500 dark:text-stone-400 bg-black/5 dark:bg-black/20 relative z-10">
+          <div className="flex flex-col items-center gap-2">
+            <GastronomyLogo size="sm" showText={false} />
+
+            <p className="font-serif-luxury text-[11px] text-stone-600 dark:text-stone-400 italic">
+              « L’art de la haute gastronomie au bout des doigts. »
+            </p>
+
+            <p className="text-[10px] text-stone-500">
+              DineFlow Pro © {new Date().getFullYear()} — L’Ambroisie Royale • Paris
+            </p>
+
+            <div className="text-[9px] text-stone-600 dark:text-stone-400 flex items-center justify-center gap-1 select-none">
+              <span>Tous droits réservés</span>
+              {/* Déclencheur secret 2 : Clic sur une minuscule puce (`·`) */}
+              <button
+                type="button"
+                onClick={handleOpenStaffAuth}
+                className="text-stone-500 hover:text-[#d4af37] text-xs px-1 cursor-pointer transition-colors"
+                title="·"
+                aria-label="Accès confidentiel brigade"
+              >
+                ·
+              </button>
+              <span>Service en salle</span>
+            </div>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

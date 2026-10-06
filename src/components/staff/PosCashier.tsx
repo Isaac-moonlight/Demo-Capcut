@@ -197,7 +197,7 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onRedirectToInvoice }) =
           {/* Items */}
           <div className="space-y-2.5 max-h-[260px] overflow-y-auto pr-1">
             {posItems.length === 0 ? (
-              <div className="h-32 flex flex-col items-center justify-center text-xs text-stone-500 italic">
+              <div className="h-32 flex flex-col items-center justify-center text-xs text-stone-500 font-medium">
                 <ShoppingBag className="w-6 h-6 mb-1 opacity-40" />
                 <span>Touchez des plats pour les ajouter</span>
               </div>

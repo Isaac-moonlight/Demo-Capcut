@@ -207,8 +207,8 @@ export const GastronomyLogo: React.FC<GastronomyLogoProps> = ({
               PRO
             </span>
           </div>
-          <span className={`font-serif-luxury italic text-stone-400 dark:text-stone-400 ${dimensions.subSize}`}>
-            Haute Gastronomie & Cave d’Exception
+          <span className={`font-semibold tracking-wide text-stone-500 dark:text-stone-400 ${dimensions.subSize}`}>
+            Haute Gastronomie • Paris
           </span>
         </div>
       )}

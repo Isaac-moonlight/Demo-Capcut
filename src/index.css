@@ -2,28 +2,29 @@
 
 @layer base {
   :root {
-    --font-serif: 'Playfair Display', Georgia, serif;
-    --font-cinzel: 'Cinzel', serif;
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-ios: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  }
+  
+  * {
+    font-style: normal !important;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    letter-spacing: -0.015em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-.font-serif-luxury {
-  font-family: 'Playfair Display', Georgia, serif;
-}
-
-.font-display-luxury {
-  font-family: 'Cinzel', serif;
-}
-
-.font-sans-clean {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+.font-ios {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
 }
 
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -31,12 +32,34 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(160, 140, 110, 0.25);
+  background: rgba(140, 140, 150, 0.3);
   border-radius: 9999px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(217, 119, 6, 0.4);
+/* Thermal receipt paper cut jagged edges */
+.receipt-paper-cut-top {
+  background: radial-gradient(circle, transparent 4px, #ffffff 4px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+  background-repeat: repeat-x;
+  height: 6px;
+}
+
+.receipt-paper-cut-bottom {
+  background: radial-gradient(circle, transparent 4px, #ffffff 4px);
+  background-size: 10px 10px;
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+  height: 6px;
+}
+
+/* Realistic Thermal Receipt Styling */
+.thermal-ticket-bw {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  font-family: 'Courier New', Courier, monospace !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+  letter-spacing: -0.2px;
 }
 
 /* Print Styles */
@@ -58,18 +81,21 @@
     width: 80mm !important;
     max-width: 80mm !important;
     margin: 0 auto !important;
-    padding: 4mm !important;
+    padding: 2mm !important;
     font-size: 11px !important;
     color: #000000 !important;
+    background: #ffffff !important;
+    font-family: 'Courier New', Courier, monospace !important;
   }
 
   .print-invoice-a4 {
     width: 100% !important;
     max-width: 210mm !important;
     margin: 0 auto !important;
-    padding: 10mm !important;
-    font-size: 12px !important;
+    padding: 8mm !important;
+    font-size: 11px !important;
     color: #000000 !important;
+    background: #ffffff !important;
   }
 }
 
@@ -78,23 +104,23 @@
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px) rotate(1.5deg);
+    transform: translateY(-6px) rotate(1.2deg);
   }
 }
 
 @keyframes pulseGold {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2), 0 0 30px rgba(245, 158, 11, 0.1);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.2), 0 0 24px rgba(212, 175, 55, 0.1);
   }
   50% {
-    box-shadow: 0 0 25px rgba(245, 158, 11, 0.45), 0 0 50px rgba(245, 158, 11, 0.25);
+    box-shadow: 0 0 22px rgba(212, 175, 55, 0.4), 0 0 40px rgba(212, 175, 55, 0.2);
   }
 }
 
 .animate-float-plate {
-  animation: floatPlate 6s ease-in-out infinite;
+  animation: floatPlate 5s ease-in-out infinite;
 }
 
 .animate-pulse-gold {
-  animation: pulseGold 3s ease-in-out infinite;
+  animation: pulseGold 2.8s ease-in-out infinite;
 }

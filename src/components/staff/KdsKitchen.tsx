@@ -125,7 +125,7 @@ export const KdsKitchen: React.FC = () => {
 
                 {/* Special instructions */}
                 {item.specialInstructions && (
-                  <div className="mt-1 text-[10px] text-yellow-200/90 italic bg-yellow-500/10 p-1 rounded border border-yellow-500/20">
+                  <div className="mt-1 text-[10px] text-yellow-200/90 font-medium bg-yellow-500/10 p-1 rounded border border-yellow-500/20">
                     ⚠️ {item.specialInstructions}
                   </div>
                 )}
@@ -218,7 +218,7 @@ export const KdsKitchen: React.FC = () => {
 
           <div className="space-y-3.5 flex-1 overflow-y-auto">
             {receivedOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-stone-500 italic">
+              <div className="h-40 flex items-center justify-center text-xs text-stone-500 font-medium">
                 Aucun bon en attente
               </div>
             ) : (
@@ -243,7 +243,7 @@ export const KdsKitchen: React.FC = () => {
 
           <div className="space-y-3.5 flex-1 overflow-y-auto">
             {inKitchenOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-stone-500 italic">
+              <div className="h-40 flex items-center justify-center text-xs text-stone-500 font-medium">
                 Aucun plat sur le feu
               </div>
             ) : (
@@ -268,7 +268,7 @@ export const KdsKitchen: React.FC = () => {
 
           <div className="space-y-3.5 flex-1 overflow-y-auto">
             {readyOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-stone-500 italic">
+              <div className="h-40 flex items-center justify-center text-xs text-stone-500 font-medium">
                 Passe dégagé
               </div>
             ) : (

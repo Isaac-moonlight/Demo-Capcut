@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useRestaurant } from '../../context/RestaurantContext';
 import { Order, Dish } from '../../types';
+import { RealisticThermalReceipt } from '../common/RealisticThermalReceipt';
 
 export const BillingErp: React.FC = () => {
   const {
@@ -302,34 +303,34 @@ export const BillingErp: React.FC = () => {
 
                 {/* Printable Document Box */}
                 {invoiceFormat === 'a4' ? (
-                  /* Standard A4 View */
-                  <div className="bg-white text-stone-900 p-8 rounded-2xl shadow-xl max-w-2xl mx-auto print-invoice-a4">
+                  /* Standard A4 Black & White Luxury View */
+                  <div className="bg-white text-black p-8 rounded-2xl shadow-xl max-w-2xl mx-auto print-invoice-a4 border border-stone-200 font-sans">
                     {/* Header */}
-                    <div className="flex justify-between items-start border-b-2 border-amber-600 pb-4 mb-6">
+                    <div className="flex justify-between items-start border-b-2 border-black pb-4 mb-6">
                       <div>
-                        <h2 className="text-xl font-bold text-amber-700">{settings.name}</h2>
-                        <p className="text-xs text-stone-600 italic">{settings.tagline}</p>
-                        <p className="text-xs text-stone-600 mt-1">
+                        <h2 className="text-2xl font-black tracking-tight text-black uppercase">{settings.name}</h2>
+                        <p className="text-xs text-stone-600 font-medium">{settings.tagline}</p>
+                        <p className="text-xs text-stone-800 mt-1">
                           {settings.address}, {settings.postalCode} {settings.city}
                         </p>
-                        <p className="text-[11px] text-stone-500">
-                          SIRET: {settings.siret} | TVA: {settings.vatNumber}
+                        <p className="text-[11px] font-mono text-stone-600 mt-0.5">
+                          SIRET : {settings.siret} | N° TVA : {settings.vatNumber}
                         </p>
                       </div>
 
                       <div className="text-right">
-                        <span className="text-xs font-black uppercase tracking-wider text-stone-500 block">
-                          Facture Complète
+                        <span className="text-xs font-black uppercase tracking-widest text-black block">
+                          FACTURE OFFICIELLE
                         </span>
-                        <span className="text-base font-bold text-stone-900">
-                          #{selectedOrder.id}
+                        <span className="text-lg font-black font-mono text-black">
+                          N° {selectedOrder.id}
                         </span>
-                        <p className="text-xs text-stone-600 mt-1">
-                          {new Date(selectedOrder.createdAt).toLocaleDateString('fr-FR')} -{' '}
+                        <p className="text-xs text-stone-700 mt-1">
+                          Date : {new Date(selectedOrder.createdAt).toLocaleDateString('fr-FR')} -{' '}
                           {new Date(selectedOrder.createdAt).toLocaleTimeString('fr-FR')}
                         </p>
-                        <p className="text-xs font-semibold text-amber-700">
-                          Table {selectedOrder.tableNumber}
+                        <p className="text-xs font-bold text-black uppercase">
+                          Table : {selectedOrder.tableNumber}
                         </p>
                       </div>
                     </div>
@@ -337,32 +338,32 @@ export const BillingErp: React.FC = () => {
                     {/* Table items */}
                     <table className="w-full text-xs border-collapse mb-6">
                       <thead>
-                        <tr className="border-b-2 border-stone-200 text-stone-600 uppercase text-[10px]">
-                          <th className="text-left py-2">Désignation</th>
-                          <th className="text-center py-2">Qté</th>
-                          <th className="text-right py-2">P.U TTC</th>
-                          <th className="text-right py-2">Total TTC</th>
+                        <tr className="border-b-2 border-black text-black uppercase text-[11px]">
+                          <th className="text-left py-2 font-black">Désignation</th>
+                          <th className="text-center py-2 font-black">Qté</th>
+                          <th className="text-right py-2 font-black">P.U TTC</th>
+                          <th className="text-right py-2 font-black">Total TTC</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-stone-100">
+                      <tbody className="divide-y divide-stone-200">
                         {selectedOrder.items.map((it, idx) => (
                           <tr key={idx} className="py-2">
                             <td className="py-2.5">
-                              <span className="font-bold text-stone-900">{it.name}</span>
+                              <span className="font-bold text-black">{it.name}</span>
                               {it.cookingPreference && (
-                                <span className="block text-[10px] text-stone-500 italic">
-                                  Cuisson: {it.cookingPreference}
+                                <span className="block text-[10px] text-stone-600 font-medium">
+                                  Cuisson : {it.cookingPreference.toUpperCase()}
                                 </span>
                               )}
                               {it.selectedAddons && it.selectedAddons.length > 0 && (
-                                <span className="block text-[10px] text-stone-500">
-                                  Suppléments: {it.selectedAddons.map((a) => a.name).join(', ')}
+                                <span className="block text-[10px] text-stone-600">
+                                  Suppléments : {it.selectedAddons.map((a) => a.name).join(', ')}
                                 </span>
                               )}
                             </td>
-                            <td className="text-center py-2.5 font-semibold">{it.quantity}</td>
-                            <td className="text-right py-2.5">{it.unitPrice.toFixed(2)} €</td>
-                            <td className="text-right py-2.5 font-bold">
+                            <td className="text-center py-2.5 font-bold">{it.quantity}</td>
+                            <td className="text-right py-2.5 font-mono">{it.unitPrice.toFixed(2)} €</td>
+                            <td className="text-right py-2.5 font-bold font-mono">
                               {it.totalPrice.toFixed(2)} €
                             </td>
                           </tr>
@@ -371,75 +372,41 @@ export const BillingErp: React.FC = () => {
                     </table>
 
                     {/* Totals & Tax breakdown */}
-                    <div className="border-t-2 border-amber-600 pt-4 flex justify-between items-start text-xs">
-                      <div className="text-stone-500 space-y-1">
-                        <p>TVA 10% : {(selectedOrder.subtotal * 0.1).toFixed(2)} €</p>
-                        <p>Total Hors Taxes : {(selectedOrder.subtotal * 0.9).toFixed(2)} €</p>
-                        <p>Règlement : {selectedOrder.paymentMethod?.toUpperCase() || 'CARTE'}</p>
+                    <div className="border-t-2 border-black pt-4 flex justify-between items-start text-xs">
+                      <div className="text-stone-700 space-y-1">
+                        <p>Total Hors Taxes (H.T.) : {(selectedOrder.subtotal / 1.1).toFixed(2)} €</p>
+                        <p>TVA 10.0% (Restauration) : {(selectedOrder.subtotal - (selectedOrder.subtotal / 1.1)).toFixed(2)} €</p>
+                        <p>TVA 20.0% : 0.00 €</p>
+                        <p className="font-bold text-black">
+                          Règlement : {selectedOrder.paymentMethod?.toUpperCase() || 'CARTE BANCAIRE'}
+                        </p>
                       </div>
 
                       <div className="text-right space-y-1">
-                        <p className="text-stone-700">
+                        <p className="text-stone-700 font-mono">
                           Sous-total TTC : {selectedOrder.subtotal.toFixed(2)} €
                         </p>
                         {selectedOrder.tipAmount > 0 && (
-                          <p className="text-amber-700 font-semibold">
-                            Pourboire : +{selectedOrder.tipAmount.toFixed(2)} €
+                          <p className="font-bold text-black font-mono">
+                            Pourboire Brigade : +{selectedOrder.tipAmount.toFixed(2)} €
                           </p>
                         )}
-                        <p className="text-lg font-black text-amber-800 pt-1">
-                          TOTAL TTC : {selectedOrder.totalAmount.toFixed(2)} €
-                        </p>
+                        <div className="border-2 border-black p-2 mt-2 bg-stone-50 text-right">
+                          <span className="text-[10px] uppercase font-black text-stone-600 block">TOTAL NET ACQUITTE</span>
+                          <span className="text-2xl font-black font-mono text-black">
+                            {selectedOrder.totalAmount.toFixed(2)} €
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="mt-8 pt-4 border-t border-stone-200 text-center text-[10px] text-stone-400">
-                      Merci pour votre confiance. DineFlow Pro - Système certifié d’encaissement.
+                    <div className="mt-8 pt-4 border-t border-dashed border-stone-300 text-center text-[10px] text-stone-500 font-mono">
+                      Document certifié conforme NF525. Facturation dématérialisée DineFlow Pro.
                     </div>
                   </div>
                 ) : (
-                  /* Thermal 80mm Receipt View */
-                  <div className="bg-white text-stone-900 p-6 rounded-2xl shadow-xl max-w-xs mx-auto font-mono text-xs print-receipt">
-                    <div className="text-center border-b border-dashed border-stone-400 pb-3 mb-3">
-                      <h3 className="font-bold text-sm tracking-tight">{settings.name}</h3>
-                      <p className="text-[10px] text-stone-600">{settings.address}</p>
-                      <p className="text-[10px] text-stone-600">SIRET: {settings.siret}</p>
-                      <p className="text-[10px] font-bold mt-1">
-                        TABLE: {selectedOrder.tableNumber} - TICKET #{selectedOrder.id}
-                      </p>
-                      <p className="text-[9px] text-stone-500">
-                        {new Date(selectedOrder.createdAt).toLocaleDateString('fr-FR')}{' '}
-                        {new Date(selectedOrder.createdAt).toLocaleTimeString('fr-FR')}
-                      </p>
-                    </div>
-
-                    <div className="space-y-1.5 border-b border-dashed border-stone-400 pb-3 mb-3">
-                      {selectedOrder.items.map((it, idx) => (
-                        <div key={idx} className="flex justify-between items-start text-[11px]">
-                          <span className="flex-1">
-                            {it.quantity}x {it.name.slice(0, 22)}
-                          </span>
-                          <span className="font-bold">{it.totalPrice.toFixed(2)} €</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="space-y-1 text-right text-xs">
-                      <div>HT : {(selectedOrder.subtotal * 0.9).toFixed(2)} €</div>
-                      <div>TVA 10% : {(selectedOrder.subtotal * 0.1).toFixed(2)} €</div>
-                      {selectedOrder.tipAmount > 0 && (
-                        <div>POURBOIRE : {selectedOrder.tipAmount.toFixed(2)} €</div>
-                      )}
-                      <div className="text-sm font-black pt-1 border-t border-stone-300">
-                        TOTAL TTC : {selectedOrder.totalAmount.toFixed(2)} €
-                      </div>
-                    </div>
-
-                    <div className="text-center text-[9px] text-stone-500 mt-4 pt-2 border-t border-dashed border-stone-400">
-                      MERCI DE VOTRE VISITE !<br />
-                      A BIENTOT
-                    </div>
-                  </div>
+                  /* Ultra-Realistic Thermal 80mm B&W Receipt */
+                  <RealisticThermalReceipt order={selectedOrder} settings={settings} />
                 )}
               </div>
             ) : (
