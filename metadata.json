@@ -1,0 +1,6 @@
+{
+  "name": "DineFlow Pro",
+  "description": "Application web haute gastronomie : Menu digital client immersif à table & Espace Brigade en temps réel (KDS Cuisine, Caisse POS, Plan de salle et Facturation/ERP).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128;
+    }
+
+    // Orders collection: read and write allowed for table orders and POS brigade
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create: if isValidId(orderId) 
+                    && request.resource.data.tableNumber is string
+                    && request.resource.data.status is string;
+      allow update: if isValidId(orderId) 
+                    && request.resource.data.tableNumber is string;
+      allow delete: if true;
+    }
+
+    // Waiter calls collection: tables can request help, staff can dismiss (delete or mark handled)
+    match /waiterCalls/{callId} {
+      allow read: if true;
+      allow create: if isValidId(callId)
+                    && request.resource.data.tableNumber is string
+                    && request.resource.data.type is string;
+      allow update: if isValidId(callId);
+      allow delete: if true;
+    }
+
+    // Inventory collection (86 mode and stock levels)
+    match /inventory/{dishId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Restaurant settings (fiscal info, SIRET, TVA, contacts)
+    match /restaurantSettings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Fallback deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

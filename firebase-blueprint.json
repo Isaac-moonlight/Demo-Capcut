@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "Restaurant order placed by client or POS staff",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "tableNumber": { "type": "string" },
+        "status": { "type": "string", "enum": ["received", "in_kitchen", "ready", "served", "paid", "cancelled"] },
+        "subtotal": { "type": "number" },
+        "taxTotal": { "type": "number" },
+        "tipAmount": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["tableNumber", "status", "totalAmount"]
+    },
+    "WaiterCall": {
+      "title": "WaiterCall",
+      "description": "Live waiter assistance call or bill request from dining table",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "tableNumber": { "type": "string" },
+        "type": { "type": "string", "enum": ["call_waiter", "bill_request", "water_bread", "urgent"] },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["tableNumber", "type", "status"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Dish stock tracking and availability mode (86 status)",
+      "type": "object",
+      "properties": {
+        "dishId": { "type": "string" },
+        "dishName": { "type": "string" },
+        "inStock": { "type": "boolean" },
+        "stockQuantity": { "type": "number" }
+      },
+      "required": ["dishId", "dishName", "inStock"]
+    },
+    "RestaurantSettings": {
+      "title": "RestaurantSettings",
+      "description": "Establishment information, fiscal SIRET/TVA and printing configurations",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "siret": { "type": "string" },
+        "vatNumber": { "type": "string" },
+        "address": { "type": "string" }
+      },
+      "required": ["name", "siret"]
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Client and POS orders in the restaurant"
+    },
+    "/waiterCalls/{callId}": {
+      "schema": "WaiterCall",
+      "description": "Real-time calls from dining tables"
+    },
+    "/inventory/{dishId}": {
+      "schema": "InventoryItem",
+      "description": "Inventory and 86 dish availability"
+    },
+    "/restaurantSettings/{settingId}": {
+      "schema": "RestaurantSettings",
+      "description": "Restaurant fiscal and billing settings"
+    }
+  }
+}
