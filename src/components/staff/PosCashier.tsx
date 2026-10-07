@@ -141,6 +141,7 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onRedirectToInvoice }) =
               <button
                 key={dish.id}
                 type="button"
+                data-tour={filteredDishes[0]?.id === dish.id ? 'pos-dish-first' : undefined}
                 disabled={isOutOfStock}
                 onClick={() => handleAddDish(dish)}
                 className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between h-28 relative cursor-pointer ${
@@ -267,6 +268,7 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onRedirectToInvoice }) =
 
             <button
               type="button"
+              data-tour="pos-pay-toggle"
               onClick={() => setPaymentType('cash')}
               className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
                 paymentType === 'cash'
@@ -311,6 +313,7 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onRedirectToInvoice }) =
           {/* Submit Checkout Button */}
           <button
             type="button"
+            data-tour="pos-checkout-btn"
             disabled={posItems.length === 0}
             onClick={handleCheckout}
             className="w-full py-4 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-40 text-stone-950 font-extrabold text-sm shadow-[0_4px_25px_rgba(245,158,11,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"

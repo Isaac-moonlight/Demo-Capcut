@@ -83,7 +83,7 @@ export const TourFloatingLauncher: React.FC = () => {
                   className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg cursor-pointer transition-all"
                 >
                   <Play className="w-4 h-4 fill-current" />
-                  <span>Lancer la Visite Guidée Complète (11 Chapitres)</span>
+                  <span>Lancer la Démo Interactive Guidée ({chapters.length} Chapitres)</span>
                 </button>
               </div>
 

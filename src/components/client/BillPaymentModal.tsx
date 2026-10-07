@@ -143,6 +143,7 @@ export const BillPaymentModal: React.FC<BillPaymentModalProps> = ({
                   <motion.button
                     key={pct}
                     type="button"
+                    data-tour={pct === 10 ? 'bill-tip-10' : undefined}
                     whileTap={{ scale: 0.94 }}
                     onClick={() => {
                       setTipPercent(pct);
@@ -191,6 +192,7 @@ export const BillPaymentModal: React.FC<BillPaymentModalProps> = ({
                 <motion.button
                   key={cnt}
                   type="button"
+                  data-tour={cnt === 2 ? 'bill-split-2' : undefined}
                   whileTap={{ scale: 0.94 }}
                   onClick={() => setSplitCount(cnt)}
                   className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${

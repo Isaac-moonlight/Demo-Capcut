@@ -27,6 +27,11 @@ export const InteractiveTourSpotlight: React.FC = () => {
   const [placement, setPlacement] = useState<'top' | 'bottom' | 'left' | 'right'>('top');
   const [actionBurst, setActionBurst] = useState<{ x: number; y: number } | null>(null);
   const targetElRef = useRef<HTMLElement | null>(null);
+  const isActionTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    isActionTriggeredRef.current = false;
+  }, [currentStep?.id]);
 
   // Measure and track target element in real time
   const updateTargetRect = useCallback(() => {
@@ -147,7 +152,8 @@ export const InteractiveTourSpotlight: React.FC = () => {
         targetEl.contains(clickTarget) ||
         !!clickTarget.closest(currentStep.targetSelector);
 
-      if (isMatch) {
+      if (isMatch && !isActionTriggeredRef.current) {
+        isActionTriggeredRef.current = true;
         // Trigger subtle chime & burst
         playServiceBell(1980);
         setActionBurst({ x: e.clientX, y: e.clientY });
@@ -155,7 +161,7 @@ export const InteractiveTourSpotlight: React.FC = () => {
         setTimeout(() => {
           setActionBurst(null);
           notifyActionDone(currentStep.id);
-        }, 220);
+        }, 180);
       }
     };
 
@@ -185,11 +191,11 @@ export const InteractiveTourSpotlight: React.FC = () => {
   let arrowLeft = targetCenterX;
 
   if (placement === 'top') {
-    bubbleTop = targetRect.top - 64;
+    bubbleTop = Math.max(22, targetRect.top - 62);
     arrowTop = targetRect.top - 12;
   } else if (placement === 'bottom') {
-    bubbleTop = targetRect.bottom + 28;
-    arrowTop = targetRect.bottom + 8;
+    bubbleTop = Math.min(window.innerHeight - 50, targetRect.bottom + 34);
+    arrowTop = targetRect.bottom + 10;
   } else if (placement === 'left') {
     bubbleTop = targetCenterY - 20;
     bubbleLeft = Math.max(halfTooltip + 10, targetRect.left - halfTooltip - 16);

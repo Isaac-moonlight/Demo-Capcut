@@ -135,7 +135,7 @@ export default function App() {
     if (currentStep.id === 'step_table_intro' || currentStep.id === 'step_table_confirm') {
       setIsTableModalOpen(true);
     }
-    if (currentStep.id === 'step_dish_modal_cooking' || currentStep.id === 'step_dish_modal_add') {
+    if (['step_dish_cooking', 'step_dish_addon', 'step_dish_qty', 'step_dish_add'].includes(currentStep.id)) {
       if (!selectedDishForDetail) {
         const wagyu = dishes.find((d) => d.id === 'wagyu-a5') || dishes[0];
         setSelectedDishForDetail(wagyu);
@@ -154,7 +154,7 @@ export default function App() {
         });
       }
     }
-    if (currentStep.id === 'step_cart_drawer_notes' || currentStep.id === 'step_cart_send_kitchen') {
+    if (currentStep.id === 'step_cart_notes' || currentStep.id === 'step_cart_send_kitchen') {
       setIsCartOpen(true);
     }
     if (currentStep.id === 'step_pin_modal') {
@@ -163,10 +163,10 @@ export default function App() {
     if (currentStep.id === 'step_post_service_choice') {
       setIsPostServiceModalOpen(true);
     }
-    if (currentStep.id === 'step_bill_pay') {
+    if (['step_bill_tip', 'step_bill_split', 'step_bill_pay'].includes(currentStep.id)) {
       setIsBillModalOpen(true);
     }
-    if (currentStep.id === 'step_feedback_receipt_finish') {
+    if (['step_feedback_stars', 'step_feedback_receipt', 'step_feedback_receipt_finish'].includes(currentStep.id)) {
       setIsFeedbackModalOpen(true);
     }
   }, [
@@ -180,45 +180,6 @@ export default function App() {
     selectedDishForDetail,
     cartItemsCount,
     addToCart,
-  ]);
-
-  // Automated state progression watchers for the tour
-  useEffect(() => {
-    if (tourStatus !== 'active' || !currentStep) return;
-
-    if (currentStep.id === 'step_dish_card' && selectedDishForDetail) {
-      notifyActionDone('step_dish_card');
-    } else if (currentStep.id === 'step_cart_floating_bar' && isCartOpen) {
-      notifyActionDone('step_cart_floating_bar');
-    } else if (currentStep.id === 'step_secret_trigger' && isPinModalOpen) {
-      notifyActionDone('step_secret_trigger');
-    } else if (currentStep.id === 'step_pin_modal' && isStaffAuthenticated && currentView === 'staff') {
-      notifyActionDone('step_pin_modal');
-    } else if (currentStep.id === 'step_staff_nav_pos' && staffSection === 'pos') {
-      notifyActionDone('step_staff_nav_pos');
-    } else if (currentStep.id === 'step_staff_nav_tables' && staffSection === 'tables') {
-      notifyActionDone('step_staff_nav_tables');
-    } else if (currentStep.id === 'step_staff_nav_erp' && staffSection === 'erp') {
-      notifyActionDone('step_staff_nav_erp');
-    } else if (currentStep.id === 'step_return_client' && currentView === 'client') {
-      notifyActionDone('step_return_client');
-    } else if (currentStep.id === 'step_post_service_choice' && isBillModalOpen) {
-      notifyActionDone('step_post_service_choice');
-    } else if (currentStep.id === 'step_bill_pay' && isFeedbackModalOpen) {
-      notifyActionDone('step_bill_pay');
-    }
-  }, [
-    tourStatus,
-    currentStep,
-    selectedDishForDetail,
-    isCartOpen,
-    isPinModalOpen,
-    isStaffAuthenticated,
-    currentView,
-    staffSection,
-    isBillModalOpen,
-    isFeedbackModalOpen,
-    notifyActionDone,
   ]);
 
   // Auto trigger table selection on first load if none is selected

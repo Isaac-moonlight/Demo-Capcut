@@ -192,6 +192,7 @@ export const KdsKitchen: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
+            data-tour="kds-test-bell"
             onClick={() => playServiceBell(1760)}
             className="px-3 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Tester le son de la cloche"

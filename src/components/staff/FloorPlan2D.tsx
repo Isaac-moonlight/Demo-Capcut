@@ -272,8 +272,10 @@ export const FloorPlan2D: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
           <div className="relative w-full max-w-md rounded-3xl bg-[#121622] border border-amber-500/30 p-6 text-stone-100 shadow-2xl">
             <button
+              type="button"
+              data-tour="floorplan-modal-close"
               onClick={() => setSelectedInspectTable(null)}
-              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-white rounded-full hover:bg-stone-800"
+              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-white rounded-full hover:bg-stone-800 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

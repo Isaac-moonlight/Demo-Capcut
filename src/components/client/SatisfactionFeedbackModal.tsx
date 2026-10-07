@@ -190,6 +190,7 @@ export const SatisfactionFeedbackModal: React.FC<SatisfactionFeedbackModalProps>
             <motion.button
               key={star}
               type="button"
+              data-tour={star === 5 ? 'feedback-star-5' : undefined}
               disabled={isSubmitted}
               whileTap={{ scale: 1.4 }}
               animate={star <= rating ? { scale: [1, 1.35, 0.9, 1.15, 1], rotate: [0, -12, 12, 0] } : { scale: 1 }}
@@ -262,6 +263,7 @@ export const SatisfactionFeedbackModal: React.FC<SatisfactionFeedbackModalProps>
           <div className="flex items-center justify-between mb-2">
             <button
               type="button"
+              data-tour="feedback-receipt-toggle"
               onClick={() => setShowReceiptPreview(!showReceiptPreview)}
               className="flex items-center gap-1.5 text-xs font-bold text-[#d4af37] hover:underline cursor-pointer"
             >

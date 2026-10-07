@@ -117,12 +117,20 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Action validation notification
   const notifyActionDone = useCallback((stepId: string) => {
-    if (currentStep && currentStep.id === stepId) {
-      setTimeout(() => {
-        nextStep();
-      }, 350);
-    }
-  }, [currentStep, nextStep]);
+    setCurrentStepIndex((prev) => {
+      const step = TOUR_STEPS[prev];
+      if (step && step.id === stepId) {
+        const nextIdx = prev + 1;
+        if (nextIdx >= TOUR_STEPS.length) {
+          setStatus('completed');
+          setIsCompletionOpen(true);
+          return prev;
+        }
+        return nextIdx;
+      }
+      return prev;
+    });
+  }, []);
 
   return (
     <TourContext.Provider

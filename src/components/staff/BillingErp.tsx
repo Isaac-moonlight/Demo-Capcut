@@ -270,6 +270,7 @@ export const BillingErp: React.FC = () => {
                     </button>
                     <button
                       type="button"
+                      data-tour="billing-thermal-btn"
                       onClick={() => setInvoiceFormat('thermal80')}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         invoiceFormat === 'thermal80'
@@ -461,6 +462,7 @@ export const BillingErp: React.FC = () => {
                     {/* Stock switch */}
                     <button
                       type="button"
+                      data-tour={dishes[0]?.id === dish.id ? 'stock-toggle-first' : undefined}
                       onClick={() => toggleDishStock(dish.id)}
                       className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                         inStock

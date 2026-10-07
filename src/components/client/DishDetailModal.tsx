@@ -141,6 +141,7 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose,
                         <motion.button
                           key={cKey}
                           type="button"
+                          data-tour={cKey === 'saignant' ? 'cooking-option-saignant' : undefined}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => {
                             setCooking(cKey);
@@ -182,6 +183,7 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose,
                       <motion.button
                         key={addon.id}
                         type="button"
+                        data-tour={addon.id === dish.addons?.[0]?.id ? 'addon-option-first' : undefined}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleAddonToggle(addon)}
                         className={`w-full flex items-center justify-between p-2 rounded-xl border transition-all text-left cursor-pointer ${
@@ -272,6 +274,7 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose,
                 </span>
                 <button
                   type="button"
+                  data-tour="dish-qty-plus"
                   onClick={() => setQuantity((q) => q + 1)}
                   className="w-7 h-7 rounded-full flex items-center justify-center bg-white dark:bg-[#1c1c1e] text-black dark:text-white shadow-sm cursor-pointer"
                 >
