@@ -214,6 +214,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="p-3 bg-white dark:bg-[#1c1c1e] border-t border-stone-100 dark:border-[#2c2c2e] space-y-2.5">
               <input
                 type="text"
+                data-tour="cart-notes-input"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Consignes cuisine (optionnel)..."
@@ -233,6 +234,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
               <motion.button
                 type="button"
+                data-tour="cart-submit-btn"
                 whileTap={{ scale: 0.95 }}
                 disabled={isSubmitting}
                 onClick={handleSendOrder}

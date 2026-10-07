@@ -85,7 +85,7 @@ export const LiveOrderRadar: React.FC<LiveOrderRadarProps> = ({ onOrderServed })
       </div>
 
       {/* 4-Step Progress Line */}
-      <div className="py-3">
+      <div className="py-3" data-tour="order-radar-status">
         <div className="relative mb-3">
           <div className="h-1 bg-stone-200 dark:bg-stone-700 rounded-full w-full" />
           <motion.div
@@ -176,6 +176,7 @@ export const LiveOrderRadar: React.FC<LiveOrderRadarProps> = ({ onOrderServed })
         <div className="flex items-center gap-1.5">
           <button
             type="button"
+            data-tour="radar-water-bread"
             onClick={() => handleQuickCall('water_bread', 'Eau & Pain')}
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#f2f2f7] dark:bg-[#2c2c2e] text-xs font-semibold hover:bg-stone-200 dark:hover:bg-[#3a3a3c] transition-all cursor-pointer"
           >
@@ -185,6 +186,7 @@ export const LiveOrderRadar: React.FC<LiveOrderRadarProps> = ({ onOrderServed })
 
           <button
             type="button"
+            data-tour="radar-call-waiter"
             onClick={() => handleQuickCall('call_waiter', 'Appel Serveur')}
             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#ff9f0a]/15 text-[#ff9f0a] text-xs font-bold hover:bg-[#ff9f0a]/25 transition-all cursor-pointer"
           >

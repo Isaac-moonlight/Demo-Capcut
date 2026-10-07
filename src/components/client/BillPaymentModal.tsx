@@ -74,6 +74,7 @@ export const BillPaymentModal: React.FC<BillPaymentModalProps> = ({
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md">
         <motion.div
+          data-tour="bill-modal-content"
           initial={{ opacity: 0, y: 50, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.96 }}
@@ -209,6 +210,7 @@ export const BillPaymentModal: React.FC<BillPaymentModalProps> = ({
             {/* Apple Pay Button (Primary on iOS) */}
             <motion.button
               type="button"
+              data-tour="bill-pay-btn"
               whileTap={{ scale: 0.96 }}
               disabled={isProcessing}
               onClick={() => handleSimulatePayment('apple_pay')}

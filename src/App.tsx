@@ -31,6 +31,13 @@ import { SatisfactionFeedbackModal } from './components/client/SatisfactionFeedb
 // Staff Layout (PC Wide Mode)
 import { StaffLayout } from './components/staff/StaffLayout';
 
+// Tour Components
+import { useTour } from './context/TourContext';
+import { InteractiveTourSpotlight } from './components/tour/InteractiveTourSpotlight';
+import { TourWelcomeModal } from './components/tour/TourWelcomeModal';
+import { TourCompletionModal } from './components/tour/TourCompletionModal';
+import { TourFloatingLauncher } from './components/tour/TourFloatingLauncher';
+
 // Category color aura map for dynamic morphing background
 const CATEGORY_BACKGROUND_AURAS: Record<string, { bg: string; glow: string; name: string }> = {
   starters: {
@@ -73,12 +80,16 @@ export default function App() {
     cartSubtotal,
     activeTableOrder,
     isStaffAuthenticated,
+    authenticateStaff,
+    staffSection,
+    setStaffSection,
     dishes,
     addToCart,
     finishClientService,
   } = useRestaurant();
 
   const { theme } = useTheme();
+  const { currentStep, status: tourStatus, notifyActionDone } = useTour();
 
   // Modals & Drawers state
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
@@ -100,6 +111,115 @@ export default function App() {
 
   // Category refs for smooth scrolling
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // Tour view and state synchronization
+  useEffect(() => {
+    if (tourStatus !== 'active' || !currentStep) return;
+
+    // 1. View syncing (client vs staff)
+    if (currentStep.requiresView === 'staff') {
+      if (!isStaffAuthenticated) {
+        authenticateStaff('1234');
+      }
+      setCurrentView('staff');
+      if (currentStep.requiresStaffSection) {
+        setStaffSection(currentStep.requiresStaffSection);
+      }
+    } else if (currentStep.requiresView === 'client') {
+      if (currentView !== 'client') {
+        setCurrentView('client');
+      }
+    }
+
+    // 2. Modals syncing for interactive demonstration
+    if (currentStep.id === 'step_table_intro' || currentStep.id === 'step_table_confirm') {
+      setIsTableModalOpen(true);
+    }
+    if (currentStep.id === 'step_dish_modal_cooking' || currentStep.id === 'step_dish_modal_add') {
+      if (!selectedDishForDetail) {
+        const wagyu = dishes.find((d) => d.id === 'wagyu-a5') || dishes[0];
+        setSelectedDishForDetail(wagyu);
+      }
+    }
+    if (currentStep.id === 'step_cart_floating_bar') {
+      if (cartItemsCount === 0) {
+        const wagyu = dishes.find((d) => d.id === 'wagyu-a5') || dishes[0];
+        addToCart({
+          dishId: wagyu.id,
+          name: wagyu.name,
+          price: wagyu.price,
+          quantity: 1,
+          selectedAddons: [],
+          image: wagyu.image,
+        });
+      }
+    }
+    if (currentStep.id === 'step_cart_drawer_notes' || currentStep.id === 'step_cart_send_kitchen') {
+      setIsCartOpen(true);
+    }
+    if (currentStep.id === 'step_pin_modal') {
+      setIsPinModalOpen(true);
+    }
+    if (currentStep.id === 'step_post_service_choice') {
+      setIsPostServiceModalOpen(true);
+    }
+    if (currentStep.id === 'step_bill_pay') {
+      setIsBillModalOpen(true);
+    }
+    if (currentStep.id === 'step_feedback_receipt_finish') {
+      setIsFeedbackModalOpen(true);
+    }
+  }, [
+    tourStatus,
+    currentStep,
+    currentView,
+    isStaffAuthenticated,
+    authenticateStaff,
+    setStaffSection,
+    dishes,
+    selectedDishForDetail,
+    cartItemsCount,
+    addToCart,
+  ]);
+
+  // Automated state progression watchers for the tour
+  useEffect(() => {
+    if (tourStatus !== 'active' || !currentStep) return;
+
+    if (currentStep.id === 'step_dish_card' && selectedDishForDetail) {
+      notifyActionDone('step_dish_card');
+    } else if (currentStep.id === 'step_cart_floating_bar' && isCartOpen) {
+      notifyActionDone('step_cart_floating_bar');
+    } else if (currentStep.id === 'step_secret_trigger' && isPinModalOpen) {
+      notifyActionDone('step_secret_trigger');
+    } else if (currentStep.id === 'step_pin_modal' && isStaffAuthenticated && currentView === 'staff') {
+      notifyActionDone('step_pin_modal');
+    } else if (currentStep.id === 'step_staff_nav_pos' && staffSection === 'pos') {
+      notifyActionDone('step_staff_nav_pos');
+    } else if (currentStep.id === 'step_staff_nav_tables' && staffSection === 'tables') {
+      notifyActionDone('step_staff_nav_tables');
+    } else if (currentStep.id === 'step_staff_nav_erp' && staffSection === 'erp') {
+      notifyActionDone('step_staff_nav_erp');
+    } else if (currentStep.id === 'step_return_client' && currentView === 'client') {
+      notifyActionDone('step_return_client');
+    } else if (currentStep.id === 'step_post_service_choice' && isBillModalOpen) {
+      notifyActionDone('step_post_service_choice');
+    } else if (currentStep.id === 'step_bill_pay' && isFeedbackModalOpen) {
+      notifyActionDone('step_bill_pay');
+    }
+  }, [
+    tourStatus,
+    currentStep,
+    selectedDishForDetail,
+    isCartOpen,
+    isPinModalOpen,
+    isStaffAuthenticated,
+    currentView,
+    staffSection,
+    isBillModalOpen,
+    isFeedbackModalOpen,
+    notifyActionDone,
+  ]);
 
   // Auto trigger table selection on first load if none is selected
   useEffect(() => {
@@ -177,7 +297,15 @@ export default function App() {
 
   // 1. SECTION BRIGADE / STAFF : RESTE EN MODE PC (Large Desktop Dashboard 100%)
   if (currentView === 'staff' && isStaffAuthenticated) {
-    return <StaffLayout onBackToClient={() => setCurrentView('client')} />;
+    return (
+      <>
+        <StaffLayout onBackToClient={() => setCurrentView('client')} />
+        <InteractiveTourSpotlight />
+        <TourWelcomeModal />
+        <TourCompletionModal />
+        <TourFloatingLauncher />
+      </>
+    );
   }
 
   // Active category aura
@@ -210,7 +338,7 @@ export default function App() {
           }`}>
             <div className="px-3 sm:px-5 h-16 flex items-center justify-between gap-2">
               {/* Logo with TRIPLE-CLICK secret staff trigger */}
-              <div className="flex items-center">
+              <div className="flex items-center" data-tour="staff-secret-logo">
                 <GastronomyLogo
                   size="sm"
                   onTripleClick={handleOpenStaffAuth}
@@ -223,6 +351,7 @@ export default function App() {
                 {/* Table Badge Selector */}
                 <button
                   type="button"
+                  data-tour="client-table-badge"
                   onClick={() => setIsTableModalOpen(true)}
                   className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
                     selectedTable
@@ -394,8 +523,8 @@ export default function App() {
           <div className="flex flex-col items-center gap-2">
             <GastronomyLogo size="sm" showText={false} />
 
-            <p className="font-serif-luxury text-[11px] text-stone-600 dark:text-stone-400 italic">
-              « L’art de la haute gastronomie au bout des doigts. »
+            <p className="font-serif-luxury text-[11px] text-stone-600 dark:text-stone-400 font-medium">
+              Menu • DineFlow Pro — Haute Gastronomie
             </p>
 
             <p className="text-[10px] text-stone-500">
@@ -407,6 +536,7 @@ export default function App() {
               {/* Déclencheur secret 2 : Clic sur une minuscule puce (`·`) */}
               <button
                 type="button"
+                data-tour="staff-secret-dot"
                 onClick={handleOpenStaffAuth}
                 className="text-stone-500 hover:text-[#d4af37] text-xs px-1 cursor-pointer transition-colors"
                 title="·"
@@ -418,6 +548,12 @@ export default function App() {
             </div>
           </div>
         </footer>
+
+        {/* INTERACTIVE GUIDED TOUR SUBSYSTEM */}
+        <InteractiveTourSpotlight />
+        <TourWelcomeModal />
+        <TourCompletionModal />
+        <TourFloatingLauncher />
       </div>
     </div>
   );

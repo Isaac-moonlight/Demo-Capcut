@@ -168,6 +168,7 @@ export const BillingErp: React.FC = () => {
 
           <button
             type="button"
+            data-tour="billing-tab-stocks"
             onClick={() => setActiveTab('stocks')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === 'stocks'
@@ -254,7 +255,7 @@ export const BillingErp: React.FC = () => {
             {selectedOrder ? (
               <div>
                 {/* Format switcher & print buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-stone-800 mb-6 no-print">
+                <div data-tour="billing-format-toggle" className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-stone-800 mb-6 no-print">
                   <div className="flex items-center gap-2">
                     <button
                       type="button"

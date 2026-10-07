@@ -76,6 +76,7 @@ export const PostServiceModal: React.FC<PostServiceModalProps> = ({
             {/* Choix B : Régler l'addition */}
             <motion.button
               type="button"
+              data-tour="post-service-bill-btn"
               whileTap={{ scale: 0.96 }}
               onClick={onChooseBill}
               className="w-full p-3 rounded-2xl bg-black text-white dark:bg-white dark:text-black text-left transition-all flex items-center justify-between shadow-md cursor-pointer"

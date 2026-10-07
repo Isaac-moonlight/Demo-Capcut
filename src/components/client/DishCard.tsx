@@ -30,6 +30,7 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onSelect, onQuickAdd, 
 
   return (
     <motion.div
+      data-tour={dish.id === 'wagyu-a5' || dish.name.toLowerCase().includes('wagyu') || dish.requiresCooking ? 'dish-card-wagyu' : undefined}
       initial={{ opacity: 0, y: 15, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.3, delay: Math.min(0.2, (index % 6) * 0.04), ease: 'easeOut' }}

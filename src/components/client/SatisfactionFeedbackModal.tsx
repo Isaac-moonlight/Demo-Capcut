@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
   Star,
   Download,
@@ -304,6 +305,7 @@ export const SatisfactionFeedbackModal: React.FC<SatisfactionFeedbackModalProps>
         <div className="mt-4 pt-3 border-t border-stone-800">
           <button
             type="button"
+            data-tour="feedback-finish-service"
             onClick={onFinishService}
             className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-[#d4af37] via-[#e5c158] to-[#b88e55] hover:from-[#e5c158] hover:to-[#d4af37] text-stone-950 font-black text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
           >

@@ -64,6 +64,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ onBackToClient }) => {
           <nav aria-label="Modules du personnel" className="flex items-center gap-1.5 bg-[#141824] p-1 rounded-2xl border border-stone-800">
             <button
               type="button"
+              data-tour="staff-tab-kds"
               onClick={() => setStaffSection('kds')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 staffSection === 'kds'
@@ -82,6 +83,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ onBackToClient }) => {
 
             <button
               type="button"
+              data-tour="staff-tab-pos"
               onClick={() => setStaffSection('pos')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 staffSection === 'pos'
@@ -95,6 +97,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ onBackToClient }) => {
 
             <button
               type="button"
+              data-tour="staff-tab-tables"
               onClick={() => setStaffSection('tables')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 staffSection === 'tables'
@@ -108,6 +111,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ onBackToClient }) => {
 
             <button
               type="button"
+              data-tour="staff-tab-erp"
               onClick={() => setStaffSection('erp')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 staffSection === 'erp'
@@ -135,6 +139,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ onBackToClient }) => {
 
             <button
               type="button"
+              data-tour="staff-btn-logout"
               onClick={() => {
                 logoutStaff();
                 onBackToClient();
@@ -151,7 +156,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ onBackToClient }) => {
 
       {/* Live Waiter Calls Alert Bar with "Traité ✓" instant Firestore deletion */}
       {waiterCalls.length > 0 && (
-        <aside aria-label="Alertes serveur en direct" className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 px-4 py-2.5 shadow-lg border-b border-amber-400">
+        <aside data-tour="staff-waiter-alerts" aria-label="Alertes serveur en direct" className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 px-4 py-2.5 shadow-lg border-b border-amber-400">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto">
             <div className="flex items-center gap-2 flex-shrink-0 font-bold text-xs uppercase tracking-wide">
               <BellRing className="w-4 h-4 animate-bounce" />
@@ -179,6 +184,7 @@ export const StaffLayout: React.FC<StaffLayoutProps> = ({ onBackToClient }) => {
                   {/* "Traité ✓" button with real-time deletion from Firestore */}
                   <button
                     type="button"
+                    data-tour="staff-alert-resolve"
                     onClick={() => resolveWaiterCall(call.id)}
                     className="ml-1 px-2.5 py-0.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-[11px] uppercase transition-colors cursor-pointer flex items-center gap-1"
                     title="Marquer comme traité et supprimer de l'écran"

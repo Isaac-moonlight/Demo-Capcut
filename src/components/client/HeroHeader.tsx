@@ -36,6 +36,7 @@ export const HeroHeader: React.FC<HeroHeaderProps> = ({
 
         {/* Circular Plate with impact zoom keyframes */}
         <motion.div
+          data-tour="hero-plate"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{
             scale: [1, 1.06, 0.98, 1.05, 1],
@@ -89,7 +90,7 @@ export const HeroHeader: React.FC<HeroHeaderProps> = ({
       </div>
 
       {/* iOS Segmented Category Controls (iPhone-styled horizontal sliding tabs) */}
-      <div className="mt-1">
+      <div className="mt-1" data-tour="category-tabs">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none snap-x px-1">
           {MENU_CATEGORIES.map((cat) => {
             const isCurrent = activeCategory === cat.id;
@@ -97,6 +98,7 @@ export const HeroHeader: React.FC<HeroHeaderProps> = ({
               <motion.button
                 key={cat.id}
                 type="button"
+                data-tour={cat.id === 'meats' ? 'category-tab-meats' : undefined}
                 whileTap={{ scale: 0.92 }}
                 onClick={() => onCategoryClick(cat.id)}
                 className={`snap-start flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${

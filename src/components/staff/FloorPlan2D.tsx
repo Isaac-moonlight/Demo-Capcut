@@ -78,7 +78,7 @@ export const FloorPlan2D: React.FC = () => {
       </div>
 
       {/* 2D Interactive Floor Layout Canvas */}
-      <div className="bg-[#0b0e14] border border-amber-500/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+      <div data-tour="floorplan-canvas" className="bg-[#0b0e14] border border-amber-500/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
         {/* Architectural zone banners */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Zone 1: Salons VIP (T1 - T4) */}
@@ -94,6 +94,7 @@ export const FloorPlan2D: React.FC = () => {
                   <button
                     key={t}
                     type="button"
+                    data-tour={t === 'T1' ? 'floorplan-table-T1' : undefined}
                     onClick={() => setSelectedInspectTable(t)}
                     className={`h-28 rounded-2xl border p-3 flex flex-col justify-between text-left transition-all relative cursor-pointer ${
                       info.state === 'bill_needed'

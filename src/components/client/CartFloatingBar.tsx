@@ -19,6 +19,7 @@ export const CartFloatingBar: React.FC<CartFloatingBarProps> = ({ onOpenCart }) 
   return (
     <AnimatePresence>
       <motion.aside
+        data-tour="cart-floating-bar"
         aria-label="Aperçu du panier"
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

@@ -61,6 +61,7 @@ export const KdsKitchen: React.FC = () => {
     return (
       <div
         key={order.id}
+        data-tour={order.status === 'received' ? 'kds-received-card' : undefined}
         className={`rounded-2xl p-4 transition-all duration-200 border flex flex-col justify-between ${
           order.status === 'ready'
             ? 'bg-[#131d18] border-emerald-500/40 shadow-lg'
@@ -137,6 +138,7 @@ export const KdsKitchen: React.FC = () => {
         {/* Action Button */}
         <button
           type="button"
+          data-tour={order.status === 'received' ? 'kds-btn-cook' : order.status === 'in_kitchen' ? 'kds-btn-ready' : 'kds-btn-served'}
           onClick={() => handleNextStep(order)}
           className={`w-full py-3 px-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md ${
             order.status === 'received'

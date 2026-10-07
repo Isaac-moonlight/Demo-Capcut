@@ -170,7 +170,7 @@ export const PosCashier: React.FC<PosCashierProps> = ({ onRedirectToInvoice }) =
       </div>
 
       {/* Right 5 cols: Ticket in Progress & Fast Payment */}
-      <div className="lg:col-span-5 bg-[#121622] rounded-3xl border border-stone-800 p-5 flex flex-col justify-between min-h-[600px]">
+      <div data-tour="pos-checkout-section" className="lg:col-span-5 bg-[#121622] rounded-3xl border border-stone-800 p-5 flex flex-col justify-between min-h-[600px]">
         <div>
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-stone-800 mb-4">

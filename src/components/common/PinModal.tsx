@@ -98,7 +98,7 @@ export const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess }
         )}
 
         {/* Tactile Keypad */}
-        <div className="grid grid-cols-3 gap-3 max-w-[280px] mx-auto">
+        <div data-tour="pin-keypad" className="grid grid-cols-3 gap-3 max-w-[280px] mx-auto">
           {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
             <button
               key={digit}

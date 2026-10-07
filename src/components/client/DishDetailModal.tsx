@@ -121,7 +121,7 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose,
 
             {/* Cuisson (Viandes / Burgers) */}
             {dish.requiresCooking && (
-              <div className="rounded-2xl p-3 bg-[#f2f2f7] dark:bg-[#2c2c2e]">
+              <div data-tour="modal-cooking-options" className="rounded-2xl p-3 bg-[#f2f2f7] dark:bg-[#2c2c2e]">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-black dark:text-white flex items-center gap-1.5">
                     <Flame className="w-3.5 h-3.5 text-[#ff9f0a]" />
@@ -282,6 +282,7 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose,
               {/* Add Button */}
               <motion.button
                 type="button"
+                data-tour="modal-add-btn"
                 whileTap={{ scale: 0.94 }}
                 onClick={handleAddToCart}
                 className="flex-1 py-3 px-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-black text-xs shadow-md flex items-center justify-between cursor-pointer"

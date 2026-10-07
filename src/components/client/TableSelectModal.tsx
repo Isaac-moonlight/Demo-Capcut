@@ -58,7 +58,7 @@ export const TableSelectModal: React.FC<TableSelectModalProps> = ({
           </div>
 
           {/* Table Grid (T1 to T12) */}
-          <div className="mb-4">
+          <div className="mb-4" data-tour="table-select-grid">
             <div className="grid grid-cols-4 gap-2">
               {tableList.map((tbl) => {
                 const isSelected = tempTable === tbl;
@@ -68,6 +68,7 @@ export const TableSelectModal: React.FC<TableSelectModalProps> = ({
                   <motion.button
                     key={tbl}
                     type="button"
+                    data-tour={tbl === 'T1' ? 'table-item-t1' : undefined}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setTempTable(tbl)}
                     className={`relative h-14 rounded-2xl flex flex-col items-center justify-center transition-all cursor-pointer ${
@@ -104,6 +105,7 @@ export const TableSelectModal: React.FC<TableSelectModalProps> = ({
           {/* Confirm Button */}
           <motion.button
             type="button"
+            data-tour="table-select-confirm"
             whileTap={{ scale: 0.94 }}
             onClick={handleConfirm}
             className="w-full py-3.5 px-4 rounded-full bg-black text-white dark:bg-white dark:text-black font-extrabold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer"
